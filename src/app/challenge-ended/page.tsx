@@ -10,7 +10,6 @@ import {
 export default function ChallengeEndedPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Logo in top left */}
       <div className="absolute top-4 left-4 md:top-8 md:left-8">
         <Image
           src="/logo.png"
@@ -22,11 +21,9 @@ export default function ChallengeEndedPage() {
         />
       </div>
 
-      {/* Centered Card */}
       <div className="flex items-center justify-center min-h-screen p-4 md:p-8">
         <Card className="max-w-md w-full">
           <CardHeader className="text-center space-y-6">
-            {/* Larger Crying Emoji */}
             <div className="flex justify-center">
               <Image
                 src="/emoji/weary-face-3d.png"
@@ -42,7 +39,7 @@ export default function ChallengeEndedPage() {
               Challenge Ended
             </CardTitle>
             <CardDescription className="text-base">
-              The ACES 15-Day Learning Challenge has concluded
+              The ACES 15-Day Learning Challenge has concluded.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
