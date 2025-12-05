@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   Card,
@@ -7,8 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
 
 export const Login = () => {
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/home" });
+  };
+
   return (
     <div className="flex flex-col items-center justify-center p-8 bg-background order-1 lg:order-2">
       <div className="w-full max-w-md space-y-8">
@@ -36,8 +43,13 @@ export const Login = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" size="lg" variant={"outline"}>
-              <img src={"/icons/google.svg"} alt="Google" className="w-5 h-5" />
+            <Button
+              className="w-full"
+              size="lg"
+              variant="outline"
+              onClick={handleGoogleSignIn}
+            >
+              <img src="/icons/google.svg" alt="Google" className="w-5 h-5" />
               Continue with Google
             </Button>
           </CardContent>
