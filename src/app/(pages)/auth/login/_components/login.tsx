@@ -13,7 +13,7 @@ import { signIn } from "next-auth/react";
 
 export const Login = () => {
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/home" });
+    signIn("google", { callbackUrl: "/" });
   };
 
   return (
