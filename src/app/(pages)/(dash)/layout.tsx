@@ -1,4 +1,5 @@
 "use server";
+import DashboardLayout from "@/components/layouts/dashboard";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -15,7 +16,7 @@ const AuthenticatedLayout = async ({
   const user = await auth();
 
   if (user?.user) {
-    return children;
+    return <DashboardLayout>{children}</DashboardLayout>;
   }
   return redirect("/auth/login");
 };

@@ -1,5 +1,7 @@
-"use client";
-
+import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker"; // Assumption: Might need to create this or omit
+import { Leaderboard } from "@/components/dashboard/leaderboard";
+import { RecentActivity } from "@/components/dashboard/recent-activity";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,238 +9,165 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Rocket } from "lucide-react";
+import Link from "next/link";
 
 export default function DashboardPage() {
-  // Mock data
-  const userData = {
-    name: "John Doe",
-    email: "john@example.com",
-    domain: "Web Development",
-    streak: 7,
-    daysCompleted: 7,
-    isDisqualified: false,
-    disqualificationReason: null,
-  };
-
-  const submissions = [
-    {
-      id: "1",
-      day: 7,
-      content: "Learned about Next.js 15 App Router and Server Components",
-      socialLink: "https://twitter.com/user/status/123",
-      createdAt: "2025-12-05T10:30:00Z",
-    },
-    {
-      id: "2",
-      day: 6,
-      content: "Deep dive into React Server Components and streaming",
-      socialLink: "https://twitter.com/user/status/122",
-      createdAt: "2025-12-04T09:15:00Z",
-    },
-    {
-      id: "3",
-      day: 5,
-      content: "Explored Tailwind CSS v4 and new features",
-      socialLink: "https://twitter.com/user/status/121",
-      createdAt: "2025-12-03T14:20:00Z",
-    },
-  ];
-
-  const progressPercentage = (userData.daysCompleted / 15) * 100;
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-8 max-w-6xl">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Track your progress and submit daily learnings
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => (window.location.href = "/home")}
-            >
-              ← Back to Home
-            </Button>
-          </div>
-
-          {/* Disqualification Banner */}
-          {userData.isDisqualified && (
-            <Card className="border-destructive bg-destructive/10">
-              <CardHeader>
-                <CardTitle className="text-destructive">
-                  ⚠️ Disqualified
-                </CardTitle>
-                <CardDescription>
-                  Reason: {userData.disqualificationReason || "Missed a day"}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          )}
-
-          {/* Stats Grid */}
-          <div className="grid gap-4 md:grid-cols-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Streak</CardDescription>
-                <CardTitle className="text-3xl">🔥 {userData.streak}</CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Progress</CardDescription>
-                <CardTitle className="text-3xl">
-                  {userData.daysCompleted}/15
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Domain</CardDescription>
-                <CardTitle className="text-lg">
-                  <Badge variant="secondary">{userData.domain}</Badge>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Status</CardDescription>
-                <CardTitle className="text-lg">
-                  <Badge
-                    variant={
-                      userData.isDisqualified ? "destructive" : "default"
-                    }
-                  >
-                    {userData.isDisqualified ? "Disqualified" : "Active"}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-          </div>
-
-          {/* Progress Bar */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Challenge Progress</CardTitle>
-              <CardDescription>
-                {userData.daysCompleted} of 15 days completed (
-                {Math.round(progressPercentage)}%)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Progress value={progressPercentage} className="h-3" />
-            </CardContent>
-          </Card>
-
-          {/* Daily Submission Form */}
-          {!userData.isDisqualified && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Submit Today's Learning</CardTitle>
-                <CardDescription>
-                  Share what you learned today (Day {userData.daysCompleted + 1}
-                  )
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="learning">What did you learn today?</Label>
-                    <Textarea
-                      id="learning"
-                      placeholder="Describe what you learned today..."
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="social-link">Social Media Link</Label>
-                    <Input
-                      id="social-link"
-                      type="url"
-                      placeholder="https://twitter.com/user/status/..."
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Link to your post where you shared today's learning
-                    </p>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="confirm-tags" />
-                    <Label
-                      htmlFor="confirm-tags"
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      I confirm that I have tagged the sponsor and ACES in my
-                      post
-                    </Label>
-                  </div>
-
-                  <Button type="submit" size="lg" className="w-full">
-                    Submit Learning
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Previous Submissions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Submissions</CardTitle>
-              <CardDescription>All your daily learning entries</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {submissions.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    No submissions yet. Start your journey today!
-                  </p>
-                ) : (
-                  submissions.map((submission, index) => (
-                    <div key={submission.id}>
-                      {index > 0 && <Separator className="my-4" />}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline">Day {submission.day}</Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(
-                              submission.createdAt
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm">{submission.content}</p>
-                        {submission.socialLink && (
-                          <a
-                            href={submission.socialLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-                          >
-                            View Post →
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
+    <div className="flex-1 space-y-4">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <div className="flex items-center space-x-2">
+          {/* <CalendarDateRangePicker /> */}
+          {/* <Button>Download</Button> */}
         </div>
       </div>
+
+      {/* CTA Section */}
+      <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="space-y-1">
+            <CardTitle className="text-2xl">
+              15-Day Learning Challenge
+            </CardTitle>
+            <CardDescription>
+              Join others in this journey to learn and build together!
+            </CardDescription>
+          </div>
+          <Rocket className="h-8 w-8 text-primary" />
+        </CardHeader>
+        <CardContent>
+          <div className="mt-4">
+            <Button asChild size="lg">
+              <Link href="/participate">Join the Challenge</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analytics" disabled>
+            Analytics
+          </TabsTrigger>
+          <TabsTrigger value="reports" disabled>
+            Reports
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="space-y-4">
+          {/* Stats (Optional placeholder) */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Participants
+                </CardTitle>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-4 w-4 text-muted-foreground"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+2350</div>
+                <p className="text-xs text-muted-foreground">
+                  +180.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Projects Submitted
+                </CardTitle>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-4 w-4 text-muted-foreground"
+                >
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+573</div>
+                <p className="text-xs text-muted-foreground">
+                  +201 since last week
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Your Rank</CardTitle>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-4 w-4 text-muted-foreground"
+                >
+                  <rect width="20" height="14" x="2" y="5" rx="2" />
+                  <path d="M2 10h20" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">#42</div>
+                <p className="text-xs text-muted-foreground">
+                  Top 5% of participants
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Active Now
+                </CardTitle>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-4 w-4 text-muted-foreground"
+                >
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+573</div>
+                <p className="text-xs text-muted-foreground">
+                  +201 since last hour
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <RecentActivity />
+            <Leaderboard />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
