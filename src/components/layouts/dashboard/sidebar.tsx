@@ -19,11 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useGetMyParticipation } from "@/queries/participate/hooks";
@@ -31,7 +29,7 @@ import { useGetMyParticipation } from "@/queries/participate/hooks";
 const SIDEBAR_LINKS = [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: "/",
     icon: LayoutDashboard,
   },
   {
