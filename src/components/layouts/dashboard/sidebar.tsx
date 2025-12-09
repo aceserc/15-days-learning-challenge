@@ -25,17 +25,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useGetMyParticipation } from "@/queries/participate/hooks";
 
 const SIDEBAR_LINKS = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-  },
-  {
-    title: "Participate",
-    href: "/participate",
-    icon: Calendar,
   },
   {
     title: "Leaderboard",
@@ -47,6 +44,23 @@ const SIDEBAR_LINKS = [
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const myParticipation = useGetMyParticipation();
+  const [sidebarLink, setSidebarLink] = useState(SIDEBAR_LINKS);
+
+  useEffect(() => {
+    if (myParticipation.isLoading) return;
+    if (!myParticipation.data?.data) {
+      setSidebarLink([
+        ...SIDEBAR_LINKS,
+        {
+          title: "Participate",
+          href: "/participate",
+          icon: Calendar,
+        },
+      ]);
+    }
+  }, [myParticipation.isLoading, myParticipation.data]);
+
   return (
     <div
       className={cn("flex flex-col h-screen border-r bg-sidebar/20", className)}
@@ -71,7 +85,7 @@ export function Sidebar({ className }: { className?: string }) {
 
       <div className="flex-1 overflow-auto py-4">
         <nav className="grid gap-1 px-2">
-          {SIDEBAR_LINKS.map((item) => (
+          {sidebarLink.map((item) => (
             <Button
               key={item.href}
               variant={pathname === item.href ? "secondary" : "ghost"}

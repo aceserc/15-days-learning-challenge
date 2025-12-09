@@ -15,6 +15,13 @@
       "when": 1765111863545,
       "tag": "0001_special_alice",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765248002732,
+      "tag": "0002_dusty_pete_wisdom",
+      "breakpoints": true
     }
   ]
 }

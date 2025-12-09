@@ -1,5 +1,4 @@
 import { Sidebar } from "./sidebar";
-import { UserNav } from "./user-nav";
 
 export default function DashboardLayout({
   children,

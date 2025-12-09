@@ -10,4 +10,7 @@ export const participants = pgTable("participant", {
     .references(() => users.id, { onDelete: "cascade" }),
   domain: text("domain").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  techfestId: text("techfestId").notNull(),
 });
+
+export type Participant = typeof participants.$inferSelect;

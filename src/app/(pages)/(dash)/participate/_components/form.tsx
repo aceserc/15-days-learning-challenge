@@ -5,8 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import Link from "next/link";
-import toast from "react-hot-toast";
-import { participateAction } from "@/app/actions/participate";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +19,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DOMAINS } from "@/content/domains";
+import { useParticipateToChallenge } from "@/queries/participate/hooks";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { parseError } from "@/lib/parse-error";
 
 const formSchema = z.object({
   domain: z.string().min(1, "Please select a domain."),
@@ -32,8 +34,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function ParticipationForm() {
-  const [isPending, startTransition] = useTransition();
-
+  const router = useRouter();
+  const participate = useParticipateToChallenge();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,18 +44,14 @@ export function ParticipationForm() {
     },
   });
 
-  function onSubmit(data: FormValues) {
-    startTransition(async () => {
-      const result = await participateAction(data.domain);
-
-      if (result.success) {
-        toast.success("You have successfully enrolled in the challenge!");
-        // Optional: Redirect or update UI state here if needed,
-        // though the server action already revalidates.
-      } else {
-        toast.error(result.error || "Something went wrong.");
-      }
-    });
+  async function onSubmit(data: FormValues) {
+    try {
+      const res = await participate.mutateAsync(data.domain);
+      toast.success(res.message);
+      router.push("/");
+    } catch (error) {
+      toast.error(parseError(error));
+    }
   }
 
   return (
@@ -65,7 +63,7 @@ export function ParticipationForm() {
             name="domain"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                <FormLabel className="text-base">Select your Domain</FormLabel>
+                <FormLabel className="text-lg">Select your Domain</FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
@@ -134,9 +132,9 @@ export function ParticipationForm() {
             type="submit"
             size="lg"
             className="w-full"
-            disabled={isPending}
+            isLoading={participate.isPending}
           >
-            {isPending ? "Enrolling..." : "Submit & Enroll"}
+            Submit & Enroll
           </Button>
         </form>
       </Form>

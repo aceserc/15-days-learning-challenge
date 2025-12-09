@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+import { Providers } from "@/providers";
 
 export const metadata: Metadata = {
   title: "ACES 15-Day Learning Challenge",
@@ -22,10 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${outfit.variable} font-sans antialiased`}>
+      <body>
         <SessionProvider>
-          {children}
-          <Toaster />
+          <Providers>{children}</Providers>
+          <Toaster position="bottom-right" />
         </SessionProvider>
       </body>
     </html>
