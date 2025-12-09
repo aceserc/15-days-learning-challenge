@@ -49,8 +49,8 @@ export function Sidebar({ className }: { className?: string }) {
   useEffect(() => {
     if (myParticipation.isLoading) return;
     if (!myParticipation.data?.data) {
-      setSidebarLink((prev) => [
-        ...prev,
+      setSidebarLink(() => [
+        ...SIDEBAR_LINKS,
         {
           title: "Participate",
           href: "/participate",
@@ -58,8 +58,8 @@ export function Sidebar({ className }: { className?: string }) {
         },
       ]);
     } else {
-      setSidebarLink((prev) => [
-        ...prev,
+      setSidebarLink(() => [
+        ...SIDEBAR_LINKS,
         {
           title: "Submissions",
           href: "/submissions",
