@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import {
   Calendar,
   ChevronsUpDown,
+  FileBadge,
   LayoutDashboard,
   LogOut,
   Settings,
@@ -48,12 +49,21 @@ export function Sidebar({ className }: { className?: string }) {
   useEffect(() => {
     if (myParticipation.isLoading) return;
     if (!myParticipation.data?.data) {
-      setSidebarLink([
-        ...SIDEBAR_LINKS,
+      setSidebarLink((prev) => [
+        ...prev,
         {
           title: "Participate",
           href: "/participate",
           icon: Calendar,
+        },
+      ]);
+    } else {
+      setSidebarLink((prev) => [
+        ...prev,
+        {
+          title: "Submissions",
+          href: "/submissions",
+          icon: FileBadge,
         },
       ]);
     }
