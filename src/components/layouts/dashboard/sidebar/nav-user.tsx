@@ -98,9 +98,7 @@ export function NavUser() {
                 <UserRound />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push("/challenge-guidelines")}
-              >
+              <DropdownMenuItem onClick={() => router.push("/guidelines")}>
                 <ShieldCheck />
                 Challenge Guidelines
               </DropdownMenuItem>
