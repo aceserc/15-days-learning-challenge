@@ -8,7 +8,7 @@ import {
   users,
   votes,
 } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, desc, sql } from "drizzle-orm";
 import { ActionResponse } from "../types";
 import { CHALLANGE_DATA } from "@/content/data";
 import { differenceInDays, startOfDay } from "date-fns";
@@ -100,6 +100,7 @@ type SubmissionWithUser = Submission & {
   user: User;
   userVote: "up" | "down" | null;
 };
+
 export const getMySubmissions = tryCatchAction(
   async (): Promise<ActionResponse<SubmissionWithUser[]>> => {
     const user = await getAuth();
@@ -112,6 +113,8 @@ export const getMySubmissions = tryCatchAction(
         link: submissions.link,
         summary: submissions.summary,
         createdAt: submissions.createdAt,
+        techfestId: submissions.techfestId,
+        voteCount: submissions.voteCount,
         user: {
           name: users.name,
           image: users.image,
@@ -132,13 +135,107 @@ export const getMySubmissions = tryCatchAction(
       return { success: true, data: [], message: "Submissions fetched" };
     }
 
+    const submissionIds = data.map((d) => d.id);
+    const myVotes = await db
+      .select()
+      .from(votes)
+      .where(
+        and(
+          inArray(votes.submissionId, submissionIds),
+          eq(votes.userId, user.id!)
+        )
+      );
+
+    const enrichedData = data.map((sub) => {
+      const vote = myVotes.find((v) => v.submissionId === sub.id);
+      return {
+        ...sub,
+        userVote: vote ? (vote.type as "up" | "down") : null,
+      };
+    });
+
     return {
       success: true,
-      data: data.map((item) => ({
-        ...item,
-        userVote: null,
-      })) as SubmissionWithUser[],
+      data: enrichedData as SubmissionWithUser[],
       message: "Submissions fetched",
+    };
+  }
+);
+
+export const getFeedSubmissions = tryCatchAction(
+  async (
+    page: number = 1,
+    limit: number = 20
+  ): Promise<
+    ActionResponse<{
+      submissions: SubmissionWithUser[];
+      hasMore: boolean;
+    }>
+  > => {
+    const user = await getAuth();
+    const offset = (page - 1) * limit;
+
+    const data = await db
+      .select({
+        id: submissions.id,
+        userId: submissions.userId,
+        day: submissions.day,
+        link: submissions.link,
+        summary: submissions.summary,
+        createdAt: submissions.createdAt,
+        techfestId: submissions.techfestId,
+        voteCount: submissions.voteCount,
+        user: {
+          name: users.name,
+          image: users.image,
+          id: users.id,
+        },
+      })
+      .from(submissions)
+      .leftJoin(users, eq(submissions.userId, users.id))
+      .where(eq(submissions.techfestId, CHALLANGE_DATA.techfestId))
+      .orderBy(desc(submissions.createdAt))
+      .limit(limit + 1)
+      .offset(offset);
+
+    const hasMore = data.length > limit;
+    const slicedData = hasMore ? data.slice(0, limit) : data;
+
+    if (slicedData.length === 0) {
+      return {
+        success: true,
+        data: { submissions: [], hasMore: false },
+        message: "Feed fetched",
+      };
+    }
+
+    const submissionIds = slicedData.map((d) => d.id);
+
+    const myVotes = await db
+      .select()
+      .from(votes)
+      .where(
+        and(
+          inArray(votes.submissionId, submissionIds),
+          eq(votes.userId, user.id!)
+        )
+      );
+
+    const enrichedData = slicedData.map((sub) => {
+      const vote = myVotes.find((v) => v.submissionId === sub.id);
+      return {
+        ...sub,
+        userVote: vote ? (vote.type as "up" | "down") : null,
+      };
+    });
+
+    return {
+      success: true,
+      data: {
+        submissions: enrichedData as SubmissionWithUser[],
+        hasMore,
+      },
+      message: "Feed fetched",
     };
   }
 );
@@ -170,8 +267,18 @@ export const voteSubmission = tryCatchAction(
               eq(votes.submissionId, submissionId)
             )
           );
+
+        await db
+          .update(submissions)
+          .set({
+            voteCount: sql`${submissions.voteCount} - ${
+              type === "up" ? 1 : -1
+            }`,
+          })
+          .where(eq(submissions.id, submissionId));
         return { success: true, message: "Vote removed" };
       } else {
+        // Change vote
         // Change vote
         await db
           .update(votes)
@@ -182,15 +289,32 @@ export const voteSubmission = tryCatchAction(
               eq(votes.submissionId, submissionId)
             )
           );
+
+        await db
+          .update(submissions)
+          .set({
+            voteCount: sql`${submissions.voteCount} + ${
+              type === "up" ? 2 : -2
+            }`,
+          })
+          .where(eq(submissions.id, submissionId));
         return { success: true, message: "Vote updated" };
       }
     } else {
+      // Create new vote
       // Create new vote
       await db.insert(votes).values({
         userId: user.id!,
         submissionId,
         type,
       });
+
+      await db
+        .update(submissions)
+        .set({
+          voteCount: sql`${submissions.voteCount} + ${type === "up" ? 1 : -1}`,
+        })
+        .where(eq(submissions.id, submissionId));
       return { success: true, message: "Vote added" };
     }
   }

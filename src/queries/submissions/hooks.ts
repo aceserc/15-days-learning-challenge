@@ -1,7 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   DailySubmission,
   deleteSubmission,
+  getFeedSubmissions,
   getMySubmissions,
   submitDailyChallenge,
 } from "./actions";
@@ -40,6 +46,27 @@ export const useDeleteSubmission = () => {
       queryClient.invalidateQueries({
         queryKey: ["getMySubmissions"],
       });
+      // Also invalidate feed
+      queryClient.invalidateQueries({
+        queryKey: ["getFeedSubmissions"],
+      });
     },
+  });
+};
+
+export const useGetFeedSubmissions = (limit: number = 20) => {
+  return useInfiniteQuery({
+    queryKey: ["getFeedSubmissions", limit],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await getFeedSubmissions(pageParam, limit);
+      if (!response.success) {
+        throw new Error(response.error);
+      }
+      return response.data;
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage?.hasMore ? allPages.length + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 };

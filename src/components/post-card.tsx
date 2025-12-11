@@ -8,30 +8,15 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import {
-  deleteSubmission,
-  voteSubmission,
-} from "@/queries/submissions/actions";
+import { voteSubmission } from "@/queries/submissions/actions";
 import { formatRelative } from "date-fns";
-import {
-  ArrowBigDown,
-  ArrowBigUp,
-  ExternalLink,
-  MoreVertical,
-  Trash,
-} from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { confirm } from "@/components/ui/alert-utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { Submission } from "@/db/schema";
 import { User } from "next-auth";
 import { api } from "@/queries";
@@ -40,15 +25,21 @@ import { parseError } from "@/lib/parse-error";
 interface PostCardProps {
   submission: Submission & {
     user: User;
+    userVote?: "up" | "down" | null;
   };
 }
 
 export const PostCard = ({
-  submission: { user, ...submission },
+  submission: { user, userVote: initialUserVote, ...submission },
 }: PostCardProps) => {
   const { data: session } = useSession();
-  const queryClient = useQueryClient();
-  const deleteSubmission = api.submissions.useDeleteSubmission();
+  const deleteSubmissionMutation = api.submissions.useDeleteSubmission();
+
+  const [isVoting, setIsVoting] = useState(false);
+  const [voteState, setVoteState] = useState({
+    userVote: initialUserVote,
+    count: submission.voteCount,
+  });
 
   const isOwner = session?.user?.id === user?.id;
 
@@ -63,11 +54,55 @@ export const PostCard = ({
 
     if (confirmed) {
       try {
-        await deleteSubmission.mutateAsync(submission.id);
+        await deleteSubmissionMutation.mutateAsync(submission.id);
         toast.success("Submission deleted successfully");
       } catch (error) {
         toast.error(parseError(error, "Failed to delete submission"));
       }
+    }
+  };
+
+  const handleVote = async (type: "up" | "down") => {
+    if (isVoting) return;
+    setIsVoting(true);
+
+    try {
+      const res = await voteSubmission(submission.id, type);
+
+      if (res.success) {
+        setVoteState((prev) => {
+          let newVote = prev.userVote;
+          let newCount = prev.count;
+
+          if (prev.userVote === type) {
+            // Toggle off (remove vote)
+            newVote = null;
+            if (type === "up") newCount -= 1;
+            else newCount += 1;
+          } else {
+            // Change vote or new vote
+            if (prev.userVote === "up" && type === "down") {
+              // Changed from up to down: -1 (remove up) + -1 (add down) = -2
+              newCount -= 2;
+            } else if (prev.userVote === "down" && type === "up") {
+              // Changed from down to up: +1 (remove down) + +1 (add up) = +2
+              newCount += 2;
+            } else {
+              // Null to vote
+              if (type === "up") newCount += 1;
+              else newCount -= 1;
+            }
+            newVote = type;
+          }
+          return { userVote: newVote, count: newCount };
+        });
+      } else {
+        toast.error(res.error || "Failed to vote");
+      }
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -93,7 +128,7 @@ export const PostCard = ({
         </div>
         {isOwner && (
           <Button
-            disabled={deleteSubmission.isPending}
+            disabled={deleteSubmissionMutation.isPending}
             variant={"ghost"}
             size={"icon-sm"}
             onClick={handleDelete}
@@ -113,29 +148,31 @@ export const PostCard = ({
           <Button
             variant="ghost"
             size="sm"
-            disabled={isOwner}
+            disabled={isOwner || isVoting}
+            onClick={() => handleVote("up")}
             className={cn(
-              "text-muted-foreground gap-2 transition-colors hover:text-green-500 hover:bg-green-500/10"
-              // voteState.userVote === "up" && "text-green-500 bg-green-500/10"
+              "text-muted-foreground gap-2 transition-colors hover:text-green-500 hover:bg-green-500/10",
+              voteState.userVote === "up" && "text-green-500 bg-green-500/10"
             )}
           >
             <ArrowBigUp
-            // className={cn(voteState.userVote === "up" && "fill-current")}
+              className={cn(voteState.userVote === "up" && "fill-current")}
             />
-            {submission.voteCount > 0 && <span>{submission.voteCount}</span>}
+            {voteState.count > 0 && <span>{voteState.count}</span>}
           </Button>
 
           <Button
-            disabled={isOwner}
+            disabled={isOwner || isVoting}
             variant="ghost"
             size="sm"
+            onClick={() => handleVote("down")}
             className={cn(
-              "text-muted-foreground gap-2 transition-colors hover:text-red-500 hover:bg-red-500/10"
-              // voteState.userVote === "down" && "text-red-500 bg-red-500/10"
+              "text-muted-foreground gap-2 transition-colors hover:text-red-500 hover:bg-red-500/10",
+              voteState.userVote === "down" && "text-red-500 bg-red-500/10"
             )}
           >
             <ArrowBigDown
-            //  className={cn(voteState.userVote === "down" && "fill-current")}
+              className={cn(voteState.userVote === "down" && "fill-current")}
             />
           </Button>
         </div>
