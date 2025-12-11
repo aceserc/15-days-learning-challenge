@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CHALLANGE_DATA } from "@/content/data";
 import { addDays, format, startOfDay } from "date-fns";
 import { CalendarOff } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { CHALLANGE_DATA } from "@/content/data";
 
 const DeadlineOver = () => {
   const startDate = startOfDay(CHALLANGE_DATA.startDate);

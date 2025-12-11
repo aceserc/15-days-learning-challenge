@@ -1,7 +1,9 @@
 "use client";
 
 import { ChevronsUpDown, LogOut, ShieldCheck, UserRound } from "lucide-react";
-
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "nextjs-toploader/app";
+import { confirm } from "@/components/ui/alert-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,9 +20,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "nextjs-toploader/app";
-import { confirm } from "@/components/ui/alert-utils";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

@@ -1,13 +1,13 @@
 "use client";
+import { usePathname } from "next/navigation";
 import {
-  Breadcrumb as BreadcrumbRoot,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
+  Breadcrumb as BreadcrumbRoot,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { usePathname } from "next/navigation";
 
 const Breadcrumb = () => {
   const pathname = usePathname();

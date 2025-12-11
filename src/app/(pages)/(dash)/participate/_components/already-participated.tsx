@@ -1,3 +1,5 @@
+import { CheckCircle2 } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,9 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DOMAINS } from "@/content/domains";
-import { Participant } from "@/db/schema";
-import { CheckCircle2 } from "lucide-react";
-import { useRouter } from "nextjs-toploader/app";
+import type { Participant } from "@/db/schema";
 
 export const AlreadyParticipated = ({ data }: { data: Participant }) => {
   const router = useRouter();

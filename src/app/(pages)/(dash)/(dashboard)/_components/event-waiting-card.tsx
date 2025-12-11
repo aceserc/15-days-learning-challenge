@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarClock } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getDaysRemaining } from "@/lib/event";
-import { CalendarClock } from "lucide-react";
 
 export function EventWaitingCard() {
   const daysRemaining = getDaysRemaining();

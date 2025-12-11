@@ -1,11 +1,11 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { Fragment } from "react";
 import { PostCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/queries";
-import { Loader2 } from "lucide-react";
-import { Fragment } from "react";
 
 export const FeedList = () => {
   const {

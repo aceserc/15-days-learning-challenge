@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import {
   AlertDialog,
@@ -11,7 +12,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ReactNode } from "react";
 
 type AlertProps = {
   title: ReactNode;

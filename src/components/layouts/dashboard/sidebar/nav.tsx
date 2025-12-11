@@ -1,7 +1,7 @@
 "use client";
 
-import { type LucideIcon } from "lucide-react";
-
+import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -9,7 +9,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
 
 export type Navlink = {
   name: string;

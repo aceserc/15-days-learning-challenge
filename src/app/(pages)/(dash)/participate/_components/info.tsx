@@ -1,8 +1,8 @@
 "use client";
-import { CHALLANGE_DATA } from "@/content/data";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CHALLANGE_DATA } from "@/content/data";
+import { cn } from "@/lib/utils";
 
 export const Info = () => {
   const [timeLeft, setTimeLeft] = useState({
@@ -68,7 +68,7 @@ export const Info = () => {
             <div
               className={cn(
                 "flex-col p-2 bg-muted rounded-md col-span-1",
-                item.className
+                item.className,
               )}
             >
               <span className="text-3xl font-bold">{item.value}</span>

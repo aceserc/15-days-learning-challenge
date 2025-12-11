@@ -1,8 +1,8 @@
+import fs from "fs/promises";
+import path from "path";
 import DashboardLayout from "@/components/layouts/dashboard";
 import { auth } from "@/lib/auth";
 import { Guideline } from "./_components/guideline";
-import fs from "fs/promises";
-import path from "path";
 
 const Page = async () => {
   const session = await auth();
@@ -13,8 +13,11 @@ const Page = async () => {
   try {
     content = await fs.readFile(filePath, "utf-8");
   } catch (error) {
-    console.error("Error reading guideline file:", error);
-    content = "# Error loading guidelines";
+    // Log error in development only
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error reading guideline file:", error);
+    }
+    content = "# Error loading guidelines\n\nPlease try again later.";
   }
 
   if (session?.user) {

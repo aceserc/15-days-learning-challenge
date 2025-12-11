@@ -1,10 +1,10 @@
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "./sidebar/app-sidebar";
-import { Separator } from "@/components/ui/separator";
 import { Breadcrumb } from "./sidebar/breadcrumb";
 
 export default function DashboardLayout({

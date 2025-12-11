@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "@/providers";
-import NextTopLoader from "nextjs-toploader";
 
 const outfit = Outfit({
   subsets: ["latin"],
