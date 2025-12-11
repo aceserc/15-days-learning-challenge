@@ -50,7 +50,8 @@ const OTHER_LINKS: Navlink[] = [
   },
   {
     name: "Support",
-    url: "/support",
+    url: "https://www.facebook.com/acesdharan",
+    target: "_blank",
     icon: CircleUserRound,
   },
 ];

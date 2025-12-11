@@ -15,6 +15,7 @@ export type Navlink = {
   name: string;
   url: string;
   icon: LucideIcon;
+  target?: string;
 };
 export function Nav({ link, label }: { link: Navlink[]; label: string }) {
   return (
@@ -24,7 +25,7 @@ export function Nav({ link, label }: { link: Navlink[]; label: string }) {
         {link.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <Link href={item.url}>
+              <Link href={item.url} target={item.target}>
                 <item.icon />
                 <span>{item.name}</span>
               </Link>
