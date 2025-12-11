@@ -11,6 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { signOut } from "next-auth/react";
+import { confirm } from "@/components/ui/alert-utils";
+
 interface NavbarProps {
   user?: {
     name?: string | null;
@@ -21,6 +24,19 @@ interface NavbarProps {
 }
 
 export function Navbar({ user, isAdmin }: NavbarProps) {
+  const handleLogout = async () => {
+    // const isConfirmed = await confirm({
+    //   title: "Log out?",
+    //   description: "Are you sure you want to log out of your account?",
+    //   actionText: "Log out",
+    //   variant: "destructive",
+    // });
+
+    if (true) {
+      await signOut();
+    }
+  };
+
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -93,7 +109,10 @@ export function Navbar({ user, isAdmin }: NavbarProps) {
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                className="text-destructive cursor-pointer"
+                onClick={handleLogout}
+              >
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
