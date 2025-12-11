@@ -1,35 +1,45 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { CHALLANGE_DATA } from "@/content/data";
 import { addDays, format, startOfDay } from "date-fns";
-import { History } from "lucide-react";
-import { useRouter } from "nextjs-toploader/app";
+import { CalendarOff } from "lucide-react";
+import Link from "next/link";
 
 const DeadlineOver = () => {
-  const router = useRouter();
   const startDate = startOfDay(CHALLANGE_DATA.startDate);
   const deadlineDate = addDays(startDate, CHALLANGE_DATA.canSubmitTillDays);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <div className="bg-destructive/10 p-4 rounded-full">
-        <History className="h-10 w-10 text-destructive" />
-      </div>
-      <h2 className="text-2xl font-semibold text-destructive">
-        Submission Deadline Over
-      </h2>
-      <p className="text-muted-foreground max-w-md">
-        The submission period for this challenge ended on{" "}
-        <span className="font-medium text-foreground">
-          {format(deadlineDate, "PPP")}
-        </span>
-        . You can still view your past submissions in the "My Submissions" tab.
-      </p>
-      <div className="flex gap-2">
-        <Button onClick={() => router.push("/")} variant="outline">
-          Back to Dashboard
+    <Card className="w-full border-dashed bg-muted/20">
+      <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-6 p-8 text-center">
+        <div className="rounded-full bg-background p-4 shadow-sm ring-1 ring-border">
+          <CalendarOff className="h-8 w-8 text-muted-foreground" />
+        </div>
+
+        <div className="space-y-2 max-w-md">
+          <h3 className="text-2xl font-bold tracking-tight">
+            Submissions Closed
+          </h3>
+          <p className="text-base text-muted-foreground">
+            The submission window for this challenge closed on{" "}
+            <span className="font-medium text-foreground">
+              {format(deadlineDate, "PPP")}
+            </span>
+            .
+          </p>
+          <p className="text-sm text-muted-foreground/80">
+            Thank you for participating! You can still view your past
+            submissions in the "My Submissions" tab.
+          </p>
+        </div>
+
+        <Button asChild variant="outline" className="mt-2">
+          <Link href="/">Back to Dashboard</Link>
         </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
