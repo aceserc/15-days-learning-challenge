@@ -15,7 +15,10 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { CHALLANGE_DATA } from "@/content/data";
-import { useSubmitDailyChallenge } from "@/queries/submissions/hooks";
+import {
+  useGetMySubmissions,
+  useSubmitDailyChallenge,
+} from "@/queries/submissions/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInDays, startOfDay } from "date-fns";
 import { useState } from "react";
@@ -52,6 +55,7 @@ type FormValues = z.infer<typeof formSchema>;
 export const SubmitForm = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const submit = useSubmitDailyChallenge();
+  const { data: submissions } = useGetMySubmissions();
   const router = useRouter();
 
   const form = useForm<FormValues>({
@@ -72,6 +76,7 @@ export const SubmitForm = () => {
   // differenceInDays returns integer difference.
   // If today == startDate, diff is 0, so Day 1.
   const currentDayNumber = differenceInDays(today, startDate) + 1;
+  const submittedDays = submissions?.data?.map((s) => s.day) || [];
 
   async function onSubmit(data: FormValues) {
     try {
@@ -120,7 +125,10 @@ export const SubmitForm = () => {
                       className="grid grid-cols-5 gap-3"
                     >
                       {days.map((day) => {
-                        const isDisabled = day > currentDayNumber;
+                        const isSubmitted = submittedDays.includes(day);
+                        const isDisabled =
+                          day > currentDayNumber || isSubmitted;
+
                         return (
                           <FormItem
                             key={day}
@@ -139,7 +147,9 @@ export const SubmitForm = () => {
                               className={cn(
                                 "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary cursor-pointer w-full aspect-square text-center",
                                 isDisabled &&
-                                  "opacity-50 cursor-not-allowed hover:bg-popover hover:text-muted-foreground"
+                                  "opacity-50 cursor-not-allowed hover:bg-popover hover:text-muted-foreground",
+                                isSubmitted &&
+                                  "bg-primary/5 border-primary/20 text-muted-foreground"
                               )}
                             >
                               <span className="text-xl font-bold">{day}</span>
@@ -151,7 +161,8 @@ export const SubmitForm = () => {
                   </FormControl>
                   <FormDescription>
                     Choose the day number corresponding to your submission. You
-                    can only submit for current or past days.
+                    can only submit for current or past days. Days you have
+                    already submitted are disabled.
                   </FormDescription>
                   <FormMessage />
                   <div className="pt-4">
