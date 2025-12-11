@@ -21,13 +21,15 @@ export const FeedList = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {Array.from({ length: 3 }, (_, i) => i).map((index) => (
-          <div key={`skeleton-${index}`} className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[200px]" />
-                <Skeleton className="h-4 w-[150px]" />
+        {Array(3)
+          .fill(0)
+          .map((_, index) => (
+            <div key={`skeleton-${index}`} className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[200px]" />
+                  <Skeleton className="h-4 w-[150px]" />
               </div>
             </div>
             <Skeleton className="h-[100px] w-full" />

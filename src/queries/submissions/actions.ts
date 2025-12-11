@@ -1,6 +1,6 @@
 "use server";
 
-import { differenceInDays, startOfDay } from "date-fns";
+import { differenceInCalendarDays, startOfDay } from "date-fns";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import type { User } from "next-auth";
 import { CHALLANGE_DATA } from "@/content/data";
@@ -79,7 +79,7 @@ export const submitDailyChallenge = tryCatchAction(
     }
 
     // Check if within duration (same day any hour is handled by startOfDay comparison logic in UI, validation here)
-    const daysSinceStart = differenceInDays(today, startDate) + 1;
+    const daysSinceStart = differenceInCalendarDays(today, startDate) + 1;
 
     if (daysSinceStart > CHALLANGE_DATA.canSubmitTillDays) {
       return { success: false, error: "Submission deadline is over." };
