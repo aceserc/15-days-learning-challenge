@@ -171,7 +171,9 @@ export const SubmitForm = () => {
                     </FormControl>
                     <FormDescription>
                       Select the day you want to submit your progress for. You
-                      can only submit for today or past days.
+                      can only submit for today or past days. If you want to
+                      resubmit your progress for a previous day, delete the
+                      previous submission and submit again.
                     </FormDescription>
                     <FormMessage />
                     <Button
