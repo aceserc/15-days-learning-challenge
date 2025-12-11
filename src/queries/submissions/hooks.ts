@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DailySubmission,
+  deleteSubmission,
   getMySubmissions,
   submitDailyChallenge,
 } from "./actions";
@@ -23,6 +24,18 @@ export const useSubmitDailyChallenge = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: serverAction(submitDailyChallenge),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getMySubmissions"],
+      });
+    },
+  });
+};
+
+export const useDeleteSubmission = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: serverAction(deleteSubmission),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getMySubmissions"],

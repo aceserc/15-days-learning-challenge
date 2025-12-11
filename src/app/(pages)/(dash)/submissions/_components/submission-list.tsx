@@ -43,7 +43,7 @@ export const SubmissionList = () => {
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3">
+    <div className="flex flex-col max-w-xl gap-6 mx-auto">
       {submissions.data.map((submission) => (
         <PostCard key={submission.id} submission={submission} />
       ))}

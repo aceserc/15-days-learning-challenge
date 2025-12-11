@@ -96,15 +96,12 @@ export const submitDailyChallenge = tryCatchAction(
   }
 );
 
+type SubmissionWithUser = Submission & {
+  user: User;
+  userVote: "up" | "down" | null;
+};
 export const getMySubmissions = tryCatchAction(
-  async (): Promise<
-    ActionResponse<
-      (Submission & {
-        user: User;
-        userVote: "up" | "down" | null;
-      })[]
-    >
-  > => {
+  async (): Promise<ActionResponse<SubmissionWithUser[]>> => {
     const user = await getAuth();
 
     const data = await db
@@ -135,32 +132,12 @@ export const getMySubmissions = tryCatchAction(
       return { success: true, data: [], message: "Submissions fetched" };
     }
 
-    const submissionIds = data.map((d) => d.id);
-    const votesData = await db
-      .select()
-      .from(votes)
-      .where(inArray(votes.submissionId, submissionIds));
-
-    const enrichedData = await Promise.all(
-      data.map(async (sub) => {
-        const myVote = await db
-          .select()
-          .from(votes)
-          .where(
-            and(eq(votes.submissionId, sub.id), eq(votes.userId, user.id!))
-          )
-          .limit(1);
-        return {
-          ...sub,
-          userVote:
-            myVote.length > 0 ? (myVote[0].type as "up" | "down") : null,
-        };
-      })
-    );
-
     return {
       success: true,
-      data: enrichedData,
+      data: data.map((item) => ({
+        ...item,
+        userVote: null,
+      })) as SubmissionWithUser[],
       message: "Submissions fetched",
     };
   }
