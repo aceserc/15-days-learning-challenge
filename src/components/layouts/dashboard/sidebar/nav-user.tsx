@@ -18,11 +18,25 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "nextjs-toploader/app";
+import { confirm } from "@/components/ui/alert-utils";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { data: session } = useSession();
+  const router = useRouter();
+
+  const onLogout = async () => {
+    const shouldLogout = await confirm({
+      title: "Logout!",
+      description: "Are you sure you want to logout?",
+      variant: "destructive",
+    });
+    if (shouldLogout) {
+      await signOut();
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -80,17 +94,19 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
                 <UserRound />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/challenge-guidelines")}
+              >
                 <ShieldCheck />
                 Challenge Guidelines
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem onClick={onLogout} className="text-destructive">
               <LogOut className="text-destructive" />
               Log out
             </DropdownMenuItem>

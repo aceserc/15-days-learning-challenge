@@ -7,7 +7,7 @@ export default function DashboardPage() {
       <div className="flex-1">
         <ParticipateToChallenge />
       </div>
-      <SponsorCard />
+      <SponsorCard name="" />
     </div>
   );
 }

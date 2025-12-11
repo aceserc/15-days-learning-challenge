@@ -1,5 +1,4 @@
 import { Card, CardContent } from "./ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface SponsorCardProps {
   name: string;
@@ -10,7 +9,7 @@ interface SponsorCardProps {
 
 const SponsorCard = ({ name, href, logo }: SponsorCardProps) => {
   return (
-    <Card className="min-w-xs w-full overflow-hidden hover:shadow-md transition-shadow">
+    <Card className="min-w-xs overflow-hidden hover:shadow-md transition-shadow">
       <CardContent className="p-0 flex items-center gap-4 bg-card/50">
         <div className="h-16 w-16 shrink-0 bg-muted flex items-center justify-center">
           {logo ? (
