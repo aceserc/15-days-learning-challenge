@@ -20,10 +20,6 @@ import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
-import {
-  useGetMySubmissions,
-  useSubmitDailyChallenge,
-} from "@/queries/submissions/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, FlaskConical, Link as LinkIcon } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
@@ -31,13 +27,8 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { api } from "@/queries";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
@@ -61,8 +52,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 export const SubmitForm = () => {
   const [step, setStep] = useState<1 | 2>(1);
-  const submit = useSubmitDailyChallenge();
-  const { data: submissions } = useGetMySubmissions();
+  const submit = api.submissions.useSubmitDailyChallenge();
+  const { data: submissions } = api.submissions.useGetMySubmissions();
   const router = useRouter();
 
   const form = useForm<FormValues>({

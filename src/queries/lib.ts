@@ -31,6 +31,7 @@ export const tryCatchAction = <Ret = void, Args extends any[] = []>(
     try {
       return await fn(...args);
     } catch (err) {
+      console.error(err);
       return {
         success: false,
         error: errorMessage ?? parseError(err),

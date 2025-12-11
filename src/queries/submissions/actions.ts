@@ -1,6 +1,5 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import {
   participants,
@@ -13,6 +12,9 @@ import { and, eq, inArray } from "drizzle-orm";
 import { ActionResponse } from "../types";
 import { CHALLANGE_DATA } from "@/content/data";
 import { differenceInDays, startOfDay } from "date-fns";
+import { tryCatchAction } from "../lib";
+import { getAuth } from "../middlewares/require-auth";
+import { User } from "next-auth";
 
 export type DailySubmission = {
   day: number;
@@ -20,14 +22,9 @@ export type DailySubmission = {
   summary: string;
 };
 
-export const submitDailyChallenge = async (
-  data: DailySubmission
-): Promise<ActionResponse> => {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "User not authenticated" };
-    }
+export const submitDailyChallenge = tryCatchAction(
+  async (data: DailySubmission): Promise<ActionResponse> => {
+    const user = await getAuth();
 
     // Double check dates logic backend side
     const today = startOfDay(new Date());
@@ -51,7 +48,7 @@ export const submitDailyChallenge = async (
       .from(participants)
       .where(
         and(
-          eq(participants.userId, session.user.id),
+          eq(participants.userId, user.id!),
           eq(participants.techfestId, CHALLANGE_DATA.techfestId)
         )
       )
@@ -70,7 +67,7 @@ export const submitDailyChallenge = async (
       .from(submissions)
       .where(
         and(
-          eq(submissions.userId, session.user.id),
+          eq(submissions.userId, user.id!),
           eq(submissions.day, data.day),
           eq(submissions.techfestId, CHALLANGE_DATA.techfestId)
         )
@@ -85,7 +82,7 @@ export const submitDailyChallenge = async (
     }
 
     await db.insert(submissions).values({
-      userId: session.user.id,
+      userId: user.id!,
       day: data.day,
       link: data.link,
       summary: data.summary,
@@ -96,35 +93,19 @@ export const submitDailyChallenge = async (
       success: true,
       message: "Thank you for submission",
     };
-  } catch (error) {
-    return { success: false, error: "Failed to submit. Please try again." };
   }
-};
+);
 
-export const getMySubmissions = async (): Promise<
-  ActionResponse<
-    {
-      id: string;
-      userId: string;
-      day: number;
-      link: string;
-      summary: string;
-      createdAt: Date;
-      user: {
-        name: string | null;
-        image: string | null;
-        id: string;
-      } | null;
-      voteCount: number;
-      userVote: "up" | "down" | null;
-    }[]
-  >
-> => {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "User not authenticated" };
-    }
+export const getMySubmissions = tryCatchAction(
+  async (): Promise<
+    ActionResponse<
+      (Submission & {
+        user: User;
+        userVote: "up" | "down" | null;
+      })[]
+    >
+  > => {
+    const user = await getAuth();
 
     const data = await db
       .select({
@@ -144,7 +125,7 @@ export const getMySubmissions = async (): Promise<
       .leftJoin(users, eq(submissions.userId, users.id))
       .where(
         and(
-          eq(submissions.userId, session.user.id),
+          eq(submissions.userId, user.id!),
           eq(submissions.techfestId, CHALLANGE_DATA.techfestId)
         )
       )
@@ -160,47 +141,43 @@ export const getMySubmissions = async (): Promise<
       .from(votes)
       .where(inArray(votes.submissionId, submissionIds));
 
-    const enrichedData = data.map((sub) => {
-      const subVotes = votesData.filter((v) => v.submissionId === sub.id);
-      const up = subVotes.filter((v) => v.type === "up").length;
-      const down = subVotes.filter((v) => v.type === "down").length;
-      const myVote = subVotes.find((v) => v.userId === session.user.id);
-      return {
-        ...sub,
-        voteCount: up - down,
-        userVote: (myVote?.type as "up" | "down") || null,
-      };
-    });
+    const enrichedData = await Promise.all(
+      data.map(async (sub) => {
+        const myVote = await db
+          .select()
+          .from(votes)
+          .where(
+            and(eq(votes.submissionId, sub.id), eq(votes.userId, user.id!))
+          )
+          .limit(1);
+        return {
+          ...sub,
+          userVote:
+            myVote.length > 0 ? (myVote[0].type as "up" | "down") : null,
+        };
+      })
+    );
 
     return {
       success: true,
       data: enrichedData,
       message: "Submissions fetched",
     };
-  } catch (error) {
-    console.error(error);
-    return { success: false, error: "Failed to fetch submissions." };
   }
-};
+);
 
-export const voteSubmission = async (
-  submissionId: string,
-  type: "up" | "down"
-): Promise<ActionResponse> => {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "User not authenticated" };
-    }
+export const voteSubmission = tryCatchAction(
+  async (
+    submissionId: string,
+    type: "up" | "down"
+  ): Promise<ActionResponse> => {
+    const user = await getAuth();
 
     const existingVote = await db
       .select()
       .from(votes)
       .where(
-        and(
-          eq(votes.submissionId, submissionId),
-          eq(votes.userId, session.user.id)
-        )
+        and(eq(votes.submissionId, submissionId), eq(votes.userId, user.id!))
       )
       .limit(1);
 
@@ -212,7 +189,7 @@ export const voteSubmission = async (
           .delete(votes)
           .where(
             and(
-              eq(votes.userId, session.user.id),
+              eq(votes.userId, user.id!),
               eq(votes.submissionId, submissionId)
             )
           );
@@ -224,7 +201,7 @@ export const voteSubmission = async (
           .set({ type })
           .where(
             and(
-              eq(votes.userId, session.user.id),
+              eq(votes.userId, user.id!),
               eq(votes.submissionId, submissionId)
             )
           );
@@ -233,33 +210,23 @@ export const voteSubmission = async (
     } else {
       // Create new vote
       await db.insert(votes).values({
-        userId: session.user.id,
+        userId: user.id!,
         submissionId,
         type,
       });
       return { success: true, message: "Vote added" };
     }
-  } catch (error) {
-    return { success: false, error: "Failed to vote" };
   }
-};
+);
 
-export const deleteSubmission = async (
-  submissionId: string
-): Promise<ActionResponse> => {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: "User not authenticated" };
-    }
+export const deleteSubmission = tryCatchAction(
+  async (submissionId: string): Promise<ActionResponse> => {
+    const user = await getAuth();
 
     const deleted = await db
       .delete(submissions)
       .where(
-        and(
-          eq(submissions.id, submissionId),
-          eq(submissions.userId, session.user.id)
-        )
+        and(eq(submissions.id, submissionId), eq(submissions.userId, user.id!))
       )
       .returning();
 
@@ -268,7 +235,5 @@ export const deleteSubmission = async (
     }
 
     return { success: true, message: "Submission deleted successfully" };
-  } catch (error) {
-    return { success: false, error: "Failed to delete submission" };
   }
-};
+);

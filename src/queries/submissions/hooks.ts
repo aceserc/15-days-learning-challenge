@@ -4,6 +4,7 @@ import {
   getMySubmissions,
   submitDailyChallenge,
 } from "./actions";
+import { serverAction } from "../lib";
 
 export const useGetMySubmissions = () => {
   return useQuery({
@@ -21,13 +22,7 @@ export const useGetMySubmissions = () => {
 export const useSubmitDailyChallenge = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: DailySubmission) => {
-      const response = await submitDailyChallenge(data);
-      if (!response.success) {
-        throw new Error(response.error);
-      }
-      return response;
-    },
+    mutationFn: serverAction(submitDailyChallenge),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getMySubmissions"],

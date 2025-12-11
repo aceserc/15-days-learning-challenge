@@ -33,73 +33,22 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { confirm } from "@/components/ui/alert-utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { Submission } from "@/db/schema";
+import { User } from "next-auth";
 
 interface PostCardProps {
-  submission: {
-    id: string;
-    day: number;
-    summary: string;
-    link: string;
-    createdAt: Date;
-    voteCount?: number;
-    userVote?: "up" | "down" | null;
+  submission: Submission & {
+    user: User;
   };
-  user: {
-    name: string | null;
-    image: string | null;
-    id: string;
-  } | null;
 }
 
-export const PostCard = ({ submission, user }: PostCardProps) => {
+export const PostCard = ({
+  submission: { user, ...submission },
+}: PostCardProps) => {
   const { data: session } = useSession();
-  const [voteState, setVoteState] = useState<{
-    count: number;
-    userVote: "up" | "down" | null;
-  }>({
-    count: submission.voteCount || 0,
-    userVote: submission.userVote || null,
-  });
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    setVoteState({
-      count: submission.voteCount || 0,
-      userVote: submission.userVote || null,
-    });
-  }, [submission.voteCount, submission.userVote]);
-
   const isOwner = session?.user?.id === user?.id;
-
-  const handleVote = async (type: "up" | "down") => {
-    // Optimistic update
-    const previousState = voteState;
-    let newCount = voteState.count;
-    let newUserVote: "up" | "down" | null = type;
-
-    if (voteState.userVote === type) {
-      // Toggle off
-      newUserVote = null;
-      newCount = type === "up" ? newCount - 1 : newCount + 1;
-    } else if (voteState.userVote) {
-      // Change vote (e.g. up to down)
-      newCount = type === "up" ? newCount + 2 : newCount - 2;
-    } else {
-      // New vote
-      newCount = type === "up" ? newCount + 1 : newCount - 1;
-    }
-
-    setVoteState({ count: newCount, userVote: newUserVote });
-
-    const res = await voteSubmission(submission.id, type);
-    if (!res.success) {
-      // Revert on failure
-      setVoteState(previousState);
-      toast.error(res.error || "Failed to vote");
-    } else {
-      queryClient.invalidateQueries({ queryKey: ["getMySubmissions"] });
-    }
-  };
 
   const handleDelete = async () => {
     const confirmed = await confirm({
@@ -145,23 +94,14 @@ export const PostCard = ({ submission, user }: PostCardProps) => {
           </span>
         </div>
         {isOwner && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="text-destructive focus:text-destructive cursor-pointer"
-              >
-                <Trash className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant={"ghost"}
+            size={"icon-sm"}
+            onClick={handleDelete}
+            className="text-destructive focus:text-destructive cursor-pointer"
+          >
+            <Trash />
+          </Button>
         )}
       </CardHeader>
       <CardContent className="px-4">
