@@ -10,9 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 export const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const handleGoogleSignIn = () => {
+    setIsLoading(true);
     signIn("google", { callbackUrl: "/" });
   };
 
@@ -44,6 +47,7 @@ export const Login = () => {
           </CardHeader>
           <CardContent>
             <Button
+              isLoading={isLoading}
               className="w-full"
               size="lg"
               variant="outline"

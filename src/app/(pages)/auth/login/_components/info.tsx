@@ -6,11 +6,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CHALLANGE_DATA } from "@/content/data";
 
 const INFO = [
   {
+    title: "Choose Your Domain",
+    description:
+      "Select from AI/ML, Cybersecurity, Web Development, or App Development",
+  },
+  {
     title: "Daily Learning",
-    description: "Learn something new every day for 15 consecutive days",
+    description: `Learn something new every day for ${CHALLANGE_DATA.durationInDays} consecutive days`,
   },
   {
     title: "Share Your Progress",
@@ -21,11 +27,6 @@ const INFO = [
     title: "Stay Consistent",
     description:
       "Missing a single day results in disqualification - consistency is key!",
-  },
-  {
-    title: "Choose Your Domain",
-    description:
-      "Select from AI/ML, Cybersecurity, Web Development, or App Development",
   },
 ];
 
@@ -44,7 +45,7 @@ export const Info = () => {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             {INFO.map((item, index) => (
-              <div className="space-y-2">
+              <div key={index} className="space-y-2">
                 <h3 className="font-semibold flex items-center gap-2">
                   <Badge variant="secondary">{index + 1}</Badge>
                   {item.title}
