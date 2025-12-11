@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { CHALLANGE_DATA } from "@/content/data";
 import { format, startOfDay } from "date-fns";
 import { CalendarClock } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 const NotStarted = () => {
   const startDate = startOfDay(CHALLANGE_DATA.startDate);

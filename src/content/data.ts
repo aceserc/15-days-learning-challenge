@@ -3,18 +3,5 @@ export const CHALLANGE_DATA = {
   techfestId: "v8.0",
   durationInDays: 15,
   canSubmitTillDays: 16,
-  sponspors: [
-    {
-      name: "Sponsor",
-      href: "",
-      banner: "",
-      logo: "",
-    },
-  ],
-  myDetails: {
-    name: "ACES",
-    logo: "",
-    href: "",
-  },
   postHashtags: ["#aces", "#alc", "#techfest"],
 };

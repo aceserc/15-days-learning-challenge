@@ -11,12 +11,6 @@ const outfit = Outfit({
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  title: "ACES 15-Day Learning Challenge",
-  description:
-    "Join the ACES 15-Day Learning Challenge and showcase your daily learning journey",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +26,7 @@ export default function RootLayout({
             initialPosition={0.08}
             crawlSpeed={200}
             height={3}
+            showSpinner={false}
             crawl={true}
             easing="ease"
             speed={200}
@@ -45,3 +40,12 @@ export default function RootLayout({
     </html>
   );
 }
+
+export const metadata: Metadata = {
+  title: "ACES 15-Day Learning Challenge",
+  description:
+    "Join the ACES 15-Day Learning Challenge and showcase your daily learning journey",
+  icons: {
+    icon: "/logo.png",
+  },
+};

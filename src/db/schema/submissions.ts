@@ -13,6 +13,7 @@ export const submissions = pgTable("submission", {
   summary: text("summary").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   techfestId: text("techfestId").notNull(),
+  voteCount: integer("voteCount").notNull().default(0),
 });
 
 export type Submission = typeof submissions.$inferSelect;

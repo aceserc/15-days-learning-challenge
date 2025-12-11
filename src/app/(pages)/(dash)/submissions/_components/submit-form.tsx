@@ -14,20 +14,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { APP_CONFIG } from "@/content/config";
 import { CHALLANGE_DATA } from "@/content/data";
-import {
-  useGetMySubmissions,
-  useSubmitDailyChallenge,
-} from "@/queries/submissions/hooks";
+import { SPONSOR } from "@/content/sponsor";
+import { getCurrentDayNumber } from "@/lib/event";
+import { parseError } from "@/lib/parse-error";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { differenceInDays, startOfDay } from "date-fns";
-import { useState } from "react";
+import { CheckCircle2, FlaskConical, Link as LinkIcon } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
-import { parseError } from "@/lib/parse-error";
-import { useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { api } from "@/queries";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
@@ -37,25 +38,22 @@ const formSchema = z.object({
     message: "You must use the required hashtags.",
   }),
   verifyMyDetails: z.boolean().refine((val) => val === true, {
-    message: `You must mention ${CHALLANGE_DATA.myDetails.name} in your post.`,
+    message: `You must mention ${APP_CONFIG.name} in your post.`,
   }),
   verifyGuidelines: z.boolean().refine((val) => val === true, {
     message: "You must acknowledge the guidelines.",
   }),
-  // We'll manage sponsors verification as an array of booleans
-  sponsors: z
-    .array(z.boolean())
-    .refine((items) => items.every((item) => item === true), {
-      message: "You must mention all sponsors.",
-    }),
+  verifySponsor: z.boolean().refine((val) => val === true, {
+    message: "You must mention the sponsor.",
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export const SubmitForm = () => {
   const [step, setStep] = useState<1 | 2>(1);
-  const submit = useSubmitDailyChallenge();
-  const { data: submissions } = useGetMySubmissions();
+  const submit = api.submissions.useSubmitDailyChallenge();
+  const { data: submissions } = api.submissions.useGetMySubmissions();
   const router = useRouter();
 
   const form = useForm<FormValues>({
@@ -66,22 +64,27 @@ export const SubmitForm = () => {
       verifyHashtags: false,
       verifyMyDetails: false,
       verifyGuidelines: false,
-      sponsors: CHALLANGE_DATA.sponspors.map(() => false),
+      verifySponsor: false,
     },
   });
 
-  // Calculate current day number relative to start date
-  const today = startOfDay(new Date());
-  const startDate = startOfDay(CHALLANGE_DATA.startDate);
-  // differenceInDays returns integer difference.
-  // If today == startDate, diff is 0, so Day 1.
-  const currentDayNumber = differenceInDays(today, startDate) + 1;
-  const submittedDays = submissions?.data?.map((s) => s.day) || [];
+  const currentDayNumber = useMemo(() => getCurrentDayNumber(), []);
+
+  const submittedDays = useMemo(
+    () => new Set(submissions?.data?.map((s) => s.day) || []),
+    [submissions?.data]
+  );
+
+  const days = useMemo(
+    () =>
+      Array.from({ length: CHALLANGE_DATA.durationInDays }, (_, i) => i + 1),
+    []
+  );
 
   async function onSubmit(data: FormValues) {
     try {
       const res = await submit.mutateAsync({
-        day: parseInt(data.day),
+        day: Number.parseInt(data.day),
         link: data.link,
         summary: data.summary,
       });
@@ -102,140 +105,130 @@ export const SubmitForm = () => {
     }
   };
 
-  const days = Array.from(
-    { length: CHALLANGE_DATA.durationInDays },
-    (_, i) => i + 1
-  );
-
   return (
-    <div className="max-w-xl mx-auto py-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {step === 1 && (
-            <FormField
-              control={form.control}
-              name="day"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Select Day</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="grid grid-cols-5 gap-3"
-                    >
-                      {days.map((day) => {
-                        const isSubmitted = submittedDays.includes(day);
-                        const isDisabled =
-                          day > currentDayNumber || isSubmitted;
+    <Card className="max-w-xl border-none shadow-none bg-transparent mx-auto">
+      <CardContent className="px-0">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {step === 1 && (
+              <FormField
+                control={form.control}
+                name="day"
+                render={({ field }) => (
+                  <FormItem className="space-y-4">
+                    <FormLabel className="sr-only">Select Day</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="grid grid-cols-4 sm:grid-cols-5 gap-3"
+                      >
+                        {days.map((day) => {
+                          const isSubmitted = submittedDays.has(day);
+                          const isDisabled =
+                            day > currentDayNumber || isSubmitted;
 
-                        return (
-                          <FormItem
-                            key={day}
-                            className="flex items-center space-x-0"
-                          >
-                            <FormControl>
-                              <RadioGroupItem
-                                value={day.toString()}
-                                id={`day-${day}`}
-                                disabled={isDisabled}
-                                className="peer sr-only "
-                              />
-                            </FormControl>
-                            <FormLabel
-                              htmlFor={`day-${day}`}
-                              className={cn(
-                                "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 [&:has([data-state=checked])]:border-primary cursor-pointer w-full aspect-square text-center",
-                                isDisabled &&
-                                  "opacity-50 cursor-not-allowed hover:bg-popover hover:text-muted-foreground",
-                                isSubmitted &&
-                                  "bg-primary/5 border-primary/20 text-muted-foreground"
-                              )}
-                            >
-                              <span className="text-xl font-bold">{day}</span>
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      })}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormDescription>
-                    Choose the day number corresponding to your submission. You
-                    can only submit for current or past days. Days you have
-                    already submitted are disabled.
-                  </FormDescription>
-                  <FormMessage />
-                  <div className="pt-4">
+                          return (
+                            <FormItem key={day} className="space-y-0">
+                              <FormControl>
+                                <RadioGroupItem
+                                  value={day.toString()}
+                                  id={`day-${day}`}
+                                  disabled={isDisabled}
+                                  className="peer sr-only"
+                                />
+                              </FormControl>
+                              <FormLabel
+                                htmlFor={`day-${day}`}
+                                className={cn(
+                                  "relative flex cursor-pointer aspect-square flex-col items-center justify-center rounded-xl border-2 border-muted bg-card py-4 text-center transition-all hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary shadow-sm",
+                                  isDisabled &&
+                                    "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
+                                  isSubmitted &&
+                                    "border-primary/20 bg-primary/5 text-primary opacity-60"
+                                )}
+                              >
+                                <span className="text-xl font-bold">{day}</span>
+                                {isSubmitted && (
+                                  <div className="absolute top-1 right-1">
+                                    <CheckCircle2 className="size-4 text-primary" />
+                                  </div>
+                                )}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        })}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormDescription>
+                      Select the day you want to submit your progress for. You
+                      can only submit for today or past days. If you want to
+                      resubmit your progress for a previous day, delete the
+                      previous submission and submit again.
+                    </FormDescription>
+                    <FormMessage />
                     <Button
                       type="button"
                       onClick={handleNext}
-                      className="w-full"
+                      className="w-full mt-4"
                     >
-                      Next
+                      Next Step
                     </Button>
-                  </div>
-                </FormItem>
-              )}
-            />
-          )}
-
-          {step === 2 && (
-            <>
-              <FormField
-                control={form.control}
-                name="link"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Post Link</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://linkedin.com/..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Share a link to your post (LinkedIn)
-                    </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
+            )}
 
-              <FormField
-                control={form.control}
-                name="summary"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>What did you learn?</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Brief summary of your learnings today..."
-                        className="min-h-[120px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {step === 2 && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="grid gap-6">
+                  <FormField
+                    control={form.control}
+                    name="link"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <LinkIcon className="h-4 w-4" /> Post Link
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://linkedin.com/posts/..."
+                            {...field}
+                            className="bg-background"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="space-y-4 pt-4 border-t">
-                <div className="space-y-1">
-                  <h4 className="font-medium text-sm text-foreground">
-                    Verification Checklist
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    Please verify that you have followed the guidelines.
-                  </p>
+                  <FormField
+                    control={form.control}
+                    name="summary"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <FlaskConical className="h-4 w-4" /> Learning Summary
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Briefly describe what you learned today..."
+                            className="min-h-[120px] bg-background resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
-                {CHALLANGE_DATA.sponspors.map((sponsor, index) => (
+                <div className="space-y-4">
                   <FormField
-                    key={index}
                     control={form.control}
-                    name={`sponsors.${index}`}
+                    name="verifySponsor"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
@@ -243,15 +236,15 @@ export const SubmitForm = () => {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal cursor-pointer">
                             I have mentioned{" "}
                             <a
-                              href={sponsor.href}
+                              href={SPONSOR.href}
                               target="_blank"
-                              className="font-semibold text-primary underline hover:text-primary/80"
+                              className="font-medium text-primary hover:underline underline-offset-4"
                               rel="noreferrer"
                             >
-                              {sponsor.name}
+                              {SPONSOR.name}
                             </a>{" "}
                             in my post.
                           </FormLabel>
@@ -259,103 +252,103 @@ export const SubmitForm = () => {
                       </FormItem>
                     )}
                   />
-                ))}
 
-                <FormField
-                  control={form.control}
-                  name="verifyMyDetails"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="font-normal">
-                          I have mentioned{" "}
-                          <a
-                            href={CHALLANGE_DATA.myDetails.href}
-                            target="_blank"
-                            className="font-semibold text-primary underline hover:text-primary/80"
-                            rel="noreferrer"
-                          >
-                            {CHALLANGE_DATA.myDetails.name}
-                          </a>{" "}
-                          in my post.
-                        </FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="verifyMyDetails"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal cursor-pointer">
+                            I have mentioned{" "}
+                            <a
+                              href={APP_CONFIG.href}
+                              target="_blank"
+                              className="font-medium text-primary hover:underline underline-offset-4"
+                              rel="noreferrer"
+                            >
+                              {APP_CONFIG.name}
+                            </a>{" "}
+                            in my post.
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="verifyHashtags"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="font-normal">
-                          I have used these hashtags:{" "}
-                          <span className="font-medium text-muted-foreground">
-                            {CHALLANGE_DATA.postHashtags.join(" ")}
-                          </span>
-                        </FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="verifyHashtags"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal cursor-pointer">
+                            I have used these hashtags:{" "}
+                            <span className="font-medium text-muted-foreground block mt-1">
+                              {CHALLANGE_DATA.postHashtags.join(" ")}
+                            </span>
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="verifyGuidelines"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="font-normal">
-                          I acknowledge I have not posted anything that violates
-                          the guidelines.
-                        </FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="verifyGuidelines"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal cursor-pointer">
+                            I acknowledge I have not posted anything that
+                            violates the guidelines.
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(1)}
+                    className="w-full sm:w-1/3"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="w-full sm:w-2/3"
+                    isLoading={submit.isPending}
+                  >
+                    Submit Progress
+                  </Button>
+                </div>
               </div>
-
-              <div className="flex gap-4 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setStep(1)}
-                  className="w-1/3"
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  className="w-2/3"
-                  isLoading={submit.isPending}
-                >
-                  Submit
-                </Button>
-              </div>
-            </>
-          )}
-        </form>
-      </Form>
-    </div>
+            )}
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };

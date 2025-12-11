@@ -1,4 +1,11 @@
-import { Sidebar } from "./sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { AppSidebar } from "./sidebar/app-sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Breadcrumb } from "./sidebar/breadcrumb";
 
 export default function DashboardLayout({
   children,
@@ -6,11 +13,23 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <div className="hidden border-r bg-muted/40 md:block md:w-64 lg:w-72">
-        <Sidebar className="sticky top-0 h-screen" />
-      </div>
-      <main className="flex-1 pt-6 px-8 pb-12">{children}</main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <Breadcrumb />
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pb-8 @container">
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

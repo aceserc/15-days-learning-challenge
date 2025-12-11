@@ -19,10 +19,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DOMAINS } from "@/content/domains";
-import { useParticipateToChallenge } from "@/queries/participate/hooks";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { parseError } from "@/lib/parse-error";
+import { api } from "@/queries";
 
 const formSchema = z.object({
   domain: z.string().min(1, "Please select a domain."),
@@ -35,7 +35,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function ParticipationForm() {
   const router = useRouter();
-  const participate = useParticipateToChallenge();
+  const participate = api.participate.useParticipateToChallenge();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,7 +63,9 @@ export function ParticipationForm() {
             name="domain"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                <FormLabel className="text-lg">Select your Domain</FormLabel>
+                <FormLabel className="text-xl font-medium">
+                  Select your Domain
+                </FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
@@ -101,7 +103,7 @@ export function ParticipationForm() {
             name="agreeToRules"
             render={({ field }) => (
               <FormItem>
-                <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormLabel className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -109,7 +111,9 @@ export function ParticipationForm() {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>I agree to the rules and regulations</FormLabel>
+                    <span className="font-medium text-base">
+                      I agree to the rules and regulations
+                    </span>
                     <FormDescription>
                       By checking this box, you agree to follow the{" "}
                       <Link
@@ -122,7 +126,7 @@ export function ParticipationForm() {
                       of the 15-Day Learning Challenge.
                     </FormDescription>
                   </div>
-                </div>
+                </FormLabel>
                 <FormMessage />
               </FormItem>
             )}

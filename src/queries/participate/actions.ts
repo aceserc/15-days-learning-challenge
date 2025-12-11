@@ -1,22 +1,17 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { Participant, participants } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { ActionResponse } from "../types";
 import { CHALLANGE_DATA } from "@/content/data";
 import { DOMAINS } from "@/content/domains";
+import { tryCatchAction } from "../lib";
+import { getAuth } from "../middlewares/require-auth";
 
-export const participateToChallenge = async (
-  domain: string
-): Promise<ActionResponse> => {
-  try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return { success: false, error: "User not authenticated" };
-    }
+export const participateToChallenge = tryCatchAction(
+  async (domain: string): Promise<ActionResponse> => {
+    const user = await getAuth();
 
     // Check if user has already participated
     const existing = await db
@@ -24,7 +19,7 @@ export const participateToChallenge = async (
       .from(participants)
       .where(
         and(
-          eq(participants.userId, session.user.id),
+          eq(participants.userId, user.id!),
           eq(participants.techfestId, CHALLANGE_DATA.techfestId)
         )
       )
@@ -47,7 +42,7 @@ export const participateToChallenge = async (
     }
 
     await db.insert(participants).values({
-      userId: session.user.id,
+      userId: user.id!,
       domain,
       techfestId: CHALLANGE_DATA.techfestId,
     });
@@ -57,30 +52,19 @@ export const participateToChallenge = async (
       message:
         "Thank your for participating in ACES 15-Day Learning Challenge!",
     };
-  } catch (error) {
-    return {
-      success: false,
-      error: "Failed to save participation, Server Error",
-    };
   }
-};
+);
 
-export const getMyParticipation = async (): Promise<
-  ActionResponse<Participant | null>
-> => {
-  try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return { success: false, error: "User not authenticated" };
-    }
+export const getMyParticipation = tryCatchAction(
+  async (): Promise<ActionResponse<Participant | null>> => {
+    const user = await getAuth();
 
     const existing = await db
       .select()
       .from(participants)
       .where(
         and(
-          eq(participants.userId, session.user.id),
+          eq(participants.userId, user.id!),
           eq(participants.techfestId, CHALLANGE_DATA.techfestId)
         )
       )
@@ -99,10 +83,5 @@ export const getMyParticipation = async (): Promise<
       message: "You have not participated in this challenge.",
       data: null,
     };
-  } catch (error) {
-    return {
-      success: false,
-      error: "Failed to check participation, Server Error",
-    };
   }
-};
+);

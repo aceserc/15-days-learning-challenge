@@ -1,9 +1,10 @@
 "use client";
 import { CHALLANGE_DATA } from "@/content/data";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const Info = () => {
+export const Info = () => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -41,26 +42,35 @@ const Info = () => {
         <h3 className="text-2xl font-bold tracking-tight mb-2">
           Challenge Starts In
         </h3>
-        <div className="grid grid-cols-4 gap-4 text-center">
+        <div className="grid grid-cols-3 xs:grid-cols-4 gap-4 text-center">
           {[
             {
               label: "Days",
+              className: "flex",
               value: timeLeft.days,
             },
             {
               label: "Hours",
+              className: "flex",
               value: timeLeft.hours,
             },
             {
               label: "Minutes",
               value: timeLeft.mins,
+              className: "flex",
             },
             {
               label: "Seconds",
               value: timeLeft.secs,
+              className: "hidden xs:flex",
             },
           ].map((item) => (
-            <div className="flex flex-col p-2 bg-muted rounded-md col-span-1">
+            <div
+              className={cn(
+                "flex-col p-2 bg-muted rounded-md col-span-1",
+                item.className
+              )}
+            >
               <span className="text-3xl font-bold">{item.value}</span>
               <span className="text-xs uppercase text-muted-foreground">
                 {item.label}
@@ -94,5 +104,3 @@ const Info = () => {
     </div>
   );
 };
-
-export default Info;
