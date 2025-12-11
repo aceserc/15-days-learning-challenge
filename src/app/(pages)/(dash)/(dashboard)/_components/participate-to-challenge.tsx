@@ -12,6 +12,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/queries";
 import { Rocket } from "lucide-react";
 import Link from "next/link";
+import { isEventStarted } from "@/lib/event";
+import { SubmitProgressCard } from "./submit-progress-card";
+import { EventWaitingCard } from "./event-waiting-card";
 
 const ParticipateToChallenge = () => {
   const participation = api.participate.useGetMyParticipation();
@@ -21,7 +24,10 @@ const ParticipateToChallenge = () => {
   }
 
   if (participation.data?.data) {
-    return <div>do submission</div>;
+    if (isEventStarted()) {
+      return <SubmitProgressCard />;
+    }
+    return <EventWaitingCard />;
   }
 
   return (
