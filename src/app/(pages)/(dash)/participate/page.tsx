@@ -1,17 +1,17 @@
 "use client";
-import { Suspense } from "react";
+import { compareAsc, startOfDay } from "date-fns";
+import { Rocket } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "nextjs-toploader/app";
-import { AnimatePresence, motion } from "motion/react";
-import { Info } from "./_components/info";
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { ParticipationForm } from "./_components/form";
-import { Rocket } from "lucide-react";
-import { useGetMyParticipation } from "@/queries/participate/hooks";
-import { CHALLANGE_DATA } from "@/content/data";
-import { compareAsc, startOfDay } from "date-fns";
 import { Loading } from "@/components/ui/loading";
+import { CHALLANGE_DATA } from "@/content/data";
+import { useGetMyParticipation } from "@/queries/participate/hooks";
 import { AlreadyParticipated } from "./_components/already-participated";
+import { ParticipationForm } from "./_components/form";
+import { Info } from "./_components/info";
 import { RegistrationClosed } from "./_components/registration-closed";
 
 const Page = () => {

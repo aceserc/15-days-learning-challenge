@@ -6,5 +6,7 @@ export const getAuth = async () => {
   if (!session?.user?.id) {
     throw new Error("User is not authenticated");
   }
-  return session.user!;
+  
+  // Return user with guaranteed id (TypeScript type assertion is safe here due to above check)
+  return session.user as Required<typeof session.user> & { id: string };
 };

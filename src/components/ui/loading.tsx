@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 
 export const Loading = ({
   className,
@@ -10,7 +10,7 @@ export const Loading = ({
   <div
     className={cn(
       "py-12 flex flex-col items-center justify-center space-y-4",
-      className
+      className,
     )}
     {...props}
   >

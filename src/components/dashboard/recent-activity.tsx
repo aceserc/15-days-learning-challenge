@@ -1,3 +1,4 @@
+import { LinkIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -6,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LinkIcon } from "lucide-react";
 
 const mockActivity = [
   {

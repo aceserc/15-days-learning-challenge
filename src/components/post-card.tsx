@@ -1,5 +1,13 @@
 "use client";
 
+import { formatRelative } from "date-fns";
+import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
+import Link from "next/link";
+import type { User } from "next-auth";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { confirm } from "@/components/ui/alert-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,19 +16,11 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { voteSubmission } from "@/queries/submissions/actions";
-import { formatRelative } from "date-fns";
-import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { confirm } from "@/components/ui/alert-utils";
-import { Submission } from "@/db/schema";
-import { User } from "next-auth";
-import { api } from "@/queries";
+import type { Submission } from "@/db/schema";
 import { parseError } from "@/lib/parse-error";
+import { cn } from "@/lib/utils";
+import { api } from "@/queries";
+import { voteSubmission } from "@/queries/submissions/actions";
 
 interface PostCardProps {
   submission: Submission & {
@@ -152,7 +152,7 @@ export const PostCard = ({
             onClick={() => handleVote("up")}
             className={cn(
               "text-muted-foreground gap-2 transition-colors hover:text-green-500 hover:bg-green-500/10",
-              voteState.userVote === "up" && "text-green-500 bg-green-500/10"
+              voteState.userVote === "up" && "text-green-500 bg-green-500/10",
             )}
           >
             <ArrowBigUp
@@ -168,7 +168,7 @@ export const PostCard = ({
             onClick={() => handleVote("down")}
             className={cn(
               "text-muted-foreground gap-2 transition-colors hover:text-red-500 hover:bg-red-500/10",
-              voteState.userVote === "down" && "text-red-500 bg-red-500/10"
+              voteState.userVote === "down" && "text-red-500 bg-red-500/10",
             )}
           >
             <ArrowBigDown

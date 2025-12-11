@@ -4,14 +4,13 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { serverAction } from "../lib";
 import {
-  DailySubmission,
   deleteSubmission,
   getFeedSubmissions,
   getMySubmissions,
   submitDailyChallenge,
 } from "./actions";
-import { serverAction } from "../lib";
 
 export const useGetMySubmissions = () => {
   return useQuery({

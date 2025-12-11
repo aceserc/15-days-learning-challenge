@@ -1,12 +1,12 @@
+import type { AdapterAccountType } from "@auth/core/adapters";
 import {
   boolean,
-  timestamp,
-  pgTable,
-  text,
-  primaryKey,
   integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
 } from "drizzle-orm/pg-core";
-import type { AdapterAccountType } from "@auth/core/adapters";
 
 export const users = pgTable("user", {
   id: text("id")
@@ -41,7 +41,7 @@ export const accounts = pgTable(
         columns: [account.provider, account.providerAccountId],
       }),
     },
-  ]
+  ],
 );
 
 export const sessions = pgTable("session", {
@@ -65,7 +65,7 @@ export const verificationTokens = pgTable(
         columns: [verificationToken.identifier, verificationToken.token],
       }),
     },
-  ]
+  ],
 );
 
 export const authenticators = pgTable(
@@ -88,5 +88,5 @@ export const authenticators = pgTable(
         columns: [authenticator.userId, authenticator.credentialID],
       }),
     },
-  ]
+  ],
 );

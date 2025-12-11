@@ -1,11 +1,11 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { Fragment } from "react";
 import { PostCard } from "@/components/post-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/queries";
-import { Loader2 } from "lucide-react";
-import { Fragment } from "react";
 
 export const FeedList = () => {
   const {
@@ -21,13 +21,15 @@ export const FeedList = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[200px]" />
-                <Skeleton className="h-4 w-[150px]" />
+        {Array(3)
+          .fill(0)
+          .map((_, index) => (
+            <div key={`skeleton-${index}`} className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[200px]" />
+                  <Skeleton className="h-4 w-[150px]" />
               </div>
             </div>
             <Skeleton className="h-[100px] w-full" />
@@ -64,8 +66,8 @@ export const FeedList = () => {
 
   return (
     <div className="space-y-6">
-      {data.pages.map((page, i) => (
-        <Fragment key={i}>
+      {data.pages.map((page, pageIndex) => (
+        <Fragment key={`page-${pageIndex}`}>
           {page?.submissions?.map((sub) => (
             <PostCard key={sub.id} submission={sub} />
           ))}

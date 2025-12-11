@@ -1,8 +1,8 @@
 "use server";
+import { redirect } from "next/navigation";
+import type React from "react";
 import DashboardLayout from "@/components/layouts/dashboard";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import React from "react";
 
 const AuthenticatedLayout = async ({
   children,

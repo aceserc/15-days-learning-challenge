@@ -1,4 +1,6 @@
 "use client";
+import { Rocket } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,12 +11,10 @@ import {
 } from "@/components/ui/card";
 import { MagicCard } from "@/components/ui/magic-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/queries";
-import { Rocket } from "lucide-react";
-import Link from "next/link";
 import { isEventStarted } from "@/lib/event";
-import { SubmitProgressCard } from "./submit-progress-card";
+import { api } from "@/queries";
 import { EventWaitingCard } from "./event-waiting-card";
+import { SubmitProgressCard } from "./submit-progress-card";
 
 const ParticipateToChallenge = () => {
   const participation = api.participate.useGetMyParticipation();

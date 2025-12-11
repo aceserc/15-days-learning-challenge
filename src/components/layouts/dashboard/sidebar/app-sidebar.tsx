@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   ChevronsUpDown,
   CircleUserRound,
@@ -9,6 +8,7 @@ import {
   Send,
   Trophy,
 } from "lucide-react";
+import type * as React from "react";
 
 import {
   Sidebar,
@@ -18,11 +18,11 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavUser } from "./nav-user";
-import { CHALLANGE_DATA } from "@/content/data";
 import { APP_CONFIG } from "@/content/config";
-import { Nav, Navlink } from "./nav";
+import { CHALLANGE_DATA } from "@/content/data";
 import { ForYouNav } from "./for-you-nav";
+import { Nav, type Navlink } from "./nav";
+import { NavUser } from "./nav-user";
 
 const GETTING_STARTED_LINKS: Navlink[] = [
   {

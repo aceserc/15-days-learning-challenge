@@ -1,5 +1,5 @@
-import { FeedList } from "./feed-list";
 import { SponsorCard } from "@/components/sponsor-card";
+import { FeedList } from "./feed-list";
 
 export default function FeedPage() {
   return (

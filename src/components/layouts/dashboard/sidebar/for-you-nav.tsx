@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Nav, Navlink } from "./nav";
-import { useGetMyParticipation } from "@/queries/participate/hooks";
 import { Calendar, FileBadge } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useGetMyParticipation } from "@/queries/participate/hooks";
+import { Nav, type Navlink } from "./nav";
 
 const FOR_YOU_LINKS: Navlink[] = [];
 

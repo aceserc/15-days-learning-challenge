@@ -1,13 +1,13 @@
 "use client";
 
+import { FileText, Plus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "nextjs-toploader/app";
 import { PostCard } from "@/components/post-card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
 import { useGetMySubmissions } from "@/queries/submissions/hooks";
-import { FileText, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "nextjs-toploader/app";
 
 export const SubmissionList = () => {
   const { data: submissions, isLoading } = useGetMySubmissions();

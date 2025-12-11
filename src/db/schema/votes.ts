@@ -1,9 +1,9 @@
 import {
-  pgTable,
-  text,
-  primaryKey,
-  timestamp,
   pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 import { submissions } from "./submissions";
@@ -24,5 +24,5 @@ export const votes = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.submissionId] }),
-  })
+  }),
 );

@@ -1,6 +1,14 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle2, FlaskConical, Link as LinkIcon } from "lucide-react";
+import { useRouter } from "nextjs-toploader/app";
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -20,14 +28,6 @@ import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, FlaskConical, Link as LinkIcon } from "lucide-react";
-import { useRouter } from "nextjs-toploader/app";
-import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/queries";
 
 const formSchema = z.object({
@@ -72,13 +72,13 @@ export const SubmitForm = () => {
 
   const submittedDays = useMemo(
     () => new Set(submissions?.data?.map((s) => s.day) || []),
-    [submissions?.data]
+    [submissions?.data],
   );
 
   const days = useMemo(
     () =>
       Array.from({ length: CHALLANGE_DATA.durationInDays }, (_, i) => i + 1),
-    []
+    [],
   );
 
   async function onSubmit(data: FormValues) {
@@ -145,7 +145,7 @@ export const SubmitForm = () => {
                                   isDisabled &&
                                     "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
                                   isSubmitted &&
-                                    "border-primary/20 bg-primary/5 text-primary opacity-60"
+                                    "border-primary/20 bg-primary/5 text-primary opacity-60",
                                 )}
                               >
                                 <span className="text-xl font-bold">{day}</span>

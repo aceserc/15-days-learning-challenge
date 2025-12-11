@@ -1,6 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,9 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
 
 export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);

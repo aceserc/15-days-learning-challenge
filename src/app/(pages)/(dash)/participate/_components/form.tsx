@@ -1,12 +1,14 @@
 "use client";
 
-import { useTransition } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import Link from "next/link";
-
+import { useRouter } from "nextjs-toploader/app";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -16,11 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DOMAINS } from "@/content/domains";
-import toast from "react-hot-toast";
-import { useRouter } from "nextjs-toploader/app";
 import { parseError } from "@/lib/parse-error";
 import { api } from "@/queries";
 

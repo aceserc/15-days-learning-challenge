@@ -1,12 +1,12 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SponsorCard } from "@/components/sponsor-card";
-import { isDeadlineOver, isEventStarted } from "@/lib/event";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "nextjs-toploader/app";
-import NotStarted from "./_components/not-started";
+import { SponsorCard } from "@/components/sponsor-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { isDeadlineOver, isEventStarted } from "@/lib/event";
 import { DeadlineOver } from "./_components/deadline-over";
+import NotStarted from "./_components/not-started";
 import { SubmissionList } from "./_components/submission-list";
 import { SubmitForm } from "./_components/submit-form";
 

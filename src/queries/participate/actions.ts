@@ -1,13 +1,13 @@
 "use server";
 
-import { db } from "@/db";
-import { Participant, participants } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { ActionResponse } from "../types";
 import { CHALLANGE_DATA } from "@/content/data";
 import { DOMAINS } from "@/content/domains";
+import { db } from "@/db";
+import { type Participant, participants } from "@/db/schema";
 import { tryCatchAction } from "../lib";
 import { getAuth } from "../middlewares/require-auth";
+import type { ActionResponse } from "../types";
 
 export const participateToChallenge = tryCatchAction(
   async (domain: string): Promise<ActionResponse> => {
@@ -19,9 +19,9 @@ export const participateToChallenge = tryCatchAction(
       .from(participants)
       .where(
         and(
-          eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.userId, user.id),
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -42,7 +42,7 @@ export const participateToChallenge = tryCatchAction(
     }
 
     await db.insert(participants).values({
-      userId: user.id!,
+      userId: user.id,
       domain,
       techfestId: CHALLANGE_DATA.techfestId,
     });
@@ -52,7 +52,7 @@ export const participateToChallenge = tryCatchAction(
       message:
         "Thank your for participating in ACES 15-Day Learning Challenge!",
     };
-  }
+  },
 );
 
 export const getMyParticipation = tryCatchAction(
@@ -64,9 +64,9 @@ export const getMyParticipation = tryCatchAction(
       .from(participants)
       .where(
         and(
-          eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.userId, user.id),
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -83,5 +83,5 @@ export const getMyParticipation = tryCatchAction(
       message: "You have not participated in this challenge.",
       data: null,
     };
-  }
+  },
 );

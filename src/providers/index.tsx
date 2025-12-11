@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { QueryProvider } from "./query-client-provider";
 
 type Props = {

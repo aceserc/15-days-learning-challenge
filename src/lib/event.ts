@@ -1,4 +1,3 @@
-import { CHALLANGE_DATA } from "@/content/data";
 import {
   addDays,
   differenceInCalendarDays,
@@ -6,6 +5,7 @@ import {
   isPast,
   startOfDay,
 } from "date-fns";
+import { CHALLANGE_DATA } from "@/content/data";
 
 export function isEventStarted(): boolean {
   return isPast(CHALLANGE_DATA.startDate);
@@ -19,7 +19,7 @@ export function getDaysRemaining(): number {
 
 export function getDeadlineDate(): Date {
   return startOfDay(
-    addDays(CHALLANGE_DATA.startDate, CHALLANGE_DATA.canSubmitTillDays)
+    addDays(CHALLANGE_DATA.startDate, CHALLANGE_DATA.canSubmitTillDays),
   );
 }
 
