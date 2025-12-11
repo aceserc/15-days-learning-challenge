@@ -66,6 +66,7 @@ export const Info = () => {
             },
           ].map((item) => (
             <div
+              key={item.label}
               className={cn(
                 "flex-col p-2 bg-muted rounded-md col-span-1",
                 item.className,

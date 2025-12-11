@@ -21,8 +21,8 @@ export const FeedList = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="space-y-4">
+        {Array.from({ length: 3 }, (_, i) => i).map((index) => (
+          <div key={`skeleton-${index}`} className="space-y-4">
             <div className="flex items-center gap-4">
               <Skeleton className="h-10 w-10 rounded-full" />
               <div className="space-y-2">
@@ -64,8 +64,8 @@ export const FeedList = () => {
 
   return (
     <div className="space-y-6">
-      {data.pages.map((page, i) => (
-        <Fragment key={i}>
+      {data.pages.map((page, pageIndex) => (
+        <Fragment key={`page-${pageIndex}`}>
           {page?.submissions?.map((sub) => (
             <PostCard key={sub.id} submission={sub} />
           ))}
