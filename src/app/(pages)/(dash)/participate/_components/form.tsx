@@ -19,10 +19,10 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DOMAINS } from "@/content/domains";
-import { useParticipateToChallenge } from "@/queries/participate/hooks";
 import toast from "react-hot-toast";
 import { useRouter } from "nextjs-toploader/app";
 import { parseError } from "@/lib/parse-error";
+import { api } from "@/queries";
 
 const formSchema = z.object({
   domain: z.string().min(1, "Please select a domain."),
@@ -35,7 +35,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function ParticipationForm() {
   const router = useRouter();
-  const participate = useParticipateToChallenge();
+  const participate = api.participate.useParticipateToChallenge();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {

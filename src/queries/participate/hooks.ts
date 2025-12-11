@@ -1,29 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMyParticipation, participateToChallenge } from "./actions";
+import { serverAction } from "../lib";
 
 export const useGetMyParticipation = () => {
   return useQuery({
     queryKey: ["getMyParticipation"],
-    queryFn: async () => {
-      const response = await getMyParticipation();
-      if (!response.success) {
-        throw new Error(response.error);
-      }
-      return response;
-    },
+    queryFn: serverAction(getMyParticipation),
   });
 };
 
 export const useParticipateToChallenge = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (domain: string) => {
-      const response = await participateToChallenge(domain);
-      if (!response.success) {
-        throw new Error(response.error);
-      }
-      return response;
-    },
+    mutationFn: serverAction(participateToChallenge),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getMyParticipation"],
