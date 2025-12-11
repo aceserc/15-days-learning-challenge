@@ -148,3 +148,32 @@ export const getMySubmissions = async (): Promise<
     return { success: false, error: "Failed to fetch submissions." };
   }
 };
+
+export const deleteSubmission = async (
+  submissionId: string
+): Promise<ActionResponse> => {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "User not authenticated" };
+    }
+
+    const deleted = await db
+      .delete(submissions)
+      .where(
+        and(
+          eq(submissions.id, submissionId),
+          eq(submissions.userId, session.user.id)
+        )
+      )
+      .returning();
+
+    if (deleted.length === 0) {
+      return { success: false, error: "Submission not found or unauthorized" };
+    }
+
+    return { success: true, message: "Submission deleted successfully" };
+  } catch (error) {
+    return { success: false, error: "Failed to delete submission" };
+  }
+};
