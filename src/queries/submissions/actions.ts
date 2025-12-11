@@ -2,8 +2,14 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { participants, Submission, submissions, users } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import {
+  participants,
+  Submission,
+  submissions,
+  users,
+  votes,
+} from "@/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { ActionResponse } from "../types";
 import { CHALLANGE_DATA } from "@/content/data";
 import { differenceInDays, startOfDay } from "date-fns";
@@ -109,6 +115,8 @@ export const getMySubmissions = async (): Promise<
         image: string | null;
         id: string;
       } | null;
+      voteCount: number;
+      userVote: "up" | "down" | null;
     }[]
   >
 > => {
@@ -142,10 +150,97 @@ export const getMySubmissions = async (): Promise<
       )
       .orderBy(submissions.day);
 
-    return { success: true, data, message: "Submissions fetched" };
+    if (data.length === 0) {
+      return { success: true, data: [], message: "Submissions fetched" };
+    }
+
+    const submissionIds = data.map((d) => d.id);
+    const votesData = await db
+      .select()
+      .from(votes)
+      .where(inArray(votes.submissionId, submissionIds));
+
+    const enrichedData = data.map((sub) => {
+      const subVotes = votesData.filter((v) => v.submissionId === sub.id);
+      const up = subVotes.filter((v) => v.type === "up").length;
+      const down = subVotes.filter((v) => v.type === "down").length;
+      const myVote = subVotes.find((v) => v.userId === session.user.id);
+      return {
+        ...sub,
+        voteCount: up - down,
+        userVote: (myVote?.type as "up" | "down") || null,
+      };
+    });
+
+    return {
+      success: true,
+      data: enrichedData,
+      message: "Submissions fetched",
+    };
   } catch (error) {
     console.error(error);
     return { success: false, error: "Failed to fetch submissions." };
+  }
+};
+
+export const voteSubmission = async (
+  submissionId: string,
+  type: "up" | "down"
+): Promise<ActionResponse> => {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "User not authenticated" };
+    }
+
+    const existingVote = await db
+      .select()
+      .from(votes)
+      .where(
+        and(
+          eq(votes.submissionId, submissionId),
+          eq(votes.userId, session.user.id)
+        )
+      )
+      .limit(1);
+
+    if (existingVote.length > 0) {
+      const vote = existingVote[0];
+      if (vote.type === type) {
+        // Toggle off
+        await db
+          .delete(votes)
+          .where(
+            and(
+              eq(votes.userId, session.user.id),
+              eq(votes.submissionId, submissionId)
+            )
+          );
+        return { success: true, message: "Vote removed" };
+      } else {
+        // Change vote
+        await db
+          .update(votes)
+          .set({ type })
+          .where(
+            and(
+              eq(votes.userId, session.user.id),
+              eq(votes.submissionId, submissionId)
+            )
+          );
+        return { success: true, message: "Vote updated" };
+      }
+    } else {
+      // Create new vote
+      await db.insert(votes).values({
+        userId: session.user.id,
+        submissionId,
+        type,
+      });
+      return { success: true, message: "Vote added" };
+    }
+  } catch (error) {
+    return { success: false, error: "Failed to vote" };
   }
 };
 

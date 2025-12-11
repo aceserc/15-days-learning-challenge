@@ -15,7 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { deleteSubmission } from "@/queries/submissions/actions";
+import {
+  deleteSubmission,
+  voteSubmission,
+} from "@/queries/submissions/actions";
 import { formatRelative } from "date-fns";
 import {
   ArrowBigDown,
@@ -26,7 +29,7 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { confirm } from "@/components/ui/alert-utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -38,6 +41,8 @@ interface PostCardProps {
     summary: string;
     link: string;
     createdAt: Date;
+    voteCount?: number;
+    userVote?: "up" | "down" | null;
   };
   user: {
     name: string | null;
@@ -48,23 +53,52 @@ interface PostCardProps {
 
 export const PostCard = ({ submission, user }: PostCardProps) => {
   const { data: session } = useSession();
-  const [isUpvoted, setIsUpvoted] = useState(false);
-  const [upvoteCount, setUpvoteCount] = useState(0); // Demo count
+  const [voteState, setVoteState] = useState<{
+    count: number;
+    userVote: "up" | "down" | null;
+  }>({
+    count: submission.voteCount || 0,
+    userVote: submission.userVote || null,
+  });
   const queryClient = useQueryClient();
 
-  const handleUpvote = () => {
-    setIsUpvoted(!isUpvoted);
-    setUpvoteCount((prev) => (isUpvoted ? prev - 1 : prev + 1));
-  };
+  useEffect(() => {
+    setVoteState({
+      count: submission.voteCount || 0,
+      userVote: submission.userVote || null,
+    });
+  }, [submission.voteCount, submission.userVote]);
 
-  const handleDownload = () => {
-    // Demo download functionality: create a text file with summary
-    const element = document.createElement("a");
-    const file = new Blob([submission.summary], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = `day-${submission.day}-submission.txt`;
-    document.body.appendChild(element);
-    element.click();
+  const isOwner = session?.user?.id === user?.id;
+
+  const handleVote = async (type: "up" | "down") => {
+    // Optimistic update
+    const previousState = voteState;
+    let newCount = voteState.count;
+    let newUserVote: "up" | "down" | null = type;
+
+    if (voteState.userVote === type) {
+      // Toggle off
+      newUserVote = null;
+      newCount = type === "up" ? newCount - 1 : newCount + 1;
+    } else if (voteState.userVote) {
+      // Change vote (e.g. up to down)
+      newCount = type === "up" ? newCount + 2 : newCount - 2;
+    } else {
+      // New vote
+      newCount = type === "up" ? newCount + 1 : newCount - 1;
+    }
+
+    setVoteState({ count: newCount, userVote: newUserVote });
+
+    const res = await voteSubmission(submission.id, type);
+    if (!res.success) {
+      // Revert on failure
+      setVoteState(previousState);
+      toast.error(res.error || "Failed to vote");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["getMySubmissions"] });
+    }
   };
 
   const handleDelete = async () => {
@@ -110,7 +144,7 @@ export const PostCard = ({ submission, user }: PostCardProps) => {
             {formatRelative(new Date(submission.createdAt), new Date())}
           </span>
         </div>
-        {session?.user?.id === user?.id && (
+        {isOwner && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -140,22 +174,30 @@ export const PostCard = ({ submission, user }: PostCardProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleUpvote}
+            onClick={() => handleVote("up")}
             className={cn(
-              "text-muted-foreground gap-2 transition-colors",
-              isUpvoted && "text-primary bg-primary/10"
+              "text-muted-foreground gap-2 transition-colors hover:text-green-500 hover:bg-green-500/10",
+              voteState.userVote === "up" && "text-green-500 bg-green-500/10"
             )}
           >
-            <ArrowBigUp className={cn(isUpvoted && "fill-current")} />
-            {upvoteCount > 0 && <span>{upvoteCount}</span>}
+            <ArrowBigUp
+              className={cn(voteState.userVote === "up" && "fill-current")}
+            />
+            {voteState.count > 0 && <span>{voteState.count}</span>}
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleDownload}
-            className="text-muted-foreground gap-2"
+            onClick={() => handleVote("down")}
+            className={cn(
+              "text-muted-foreground gap-2 transition-colors hover:text-red-500 hover:bg-red-500/10",
+              voteState.userVote === "down" && "text-red-500 bg-red-500/10"
+            )}
           >
-            <ArrowBigDown className="h-4 w-4" />
+            <ArrowBigDown
+              className={cn(voteState.userVote === "down" && "fill-current")}
+            />
           </Button>
         </div>
         <Button variant="outline" size="sm" asChild className="gap-2">

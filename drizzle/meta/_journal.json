@@ -29,6 +29,13 @@
       "when": 1765251658787,
       "tag": "0003_deep_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1765416814477,
+      "tag": "0004_tidy_spiral",
+      "breakpoints": true
     }
   ]
 }
