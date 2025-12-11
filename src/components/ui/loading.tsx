@@ -9,12 +9,12 @@ export const Loading = ({
 }: ComponentProps<"div">) => (
   <div
     className={cn(
-      "h-[60vh] flex flex-col items-center justify-center space-y-4",
+      "py-12 flex flex-col items-center justify-center space-y-4",
       className
     )}
     {...props}
   >
-    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+    <Loader2 className="size-8 animate-spin text-primary" />
     <p className="text-muted-foreground animate-pulse">{children}</p>
   </div>
 );

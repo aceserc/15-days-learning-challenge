@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { DOMAINS } from "@/content/domains";
 import { Participant } from "@/db/schema";
 import { CheckCircle2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 export const AlreadyParticipated = ({ data }: { data: Participant }) => {
   const router = useRouter();
 

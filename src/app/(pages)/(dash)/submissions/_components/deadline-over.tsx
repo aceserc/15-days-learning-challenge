@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { CHALLANGE_DATA } from "@/content/data";
 import { addDays, format, startOfDay } from "date-fns";
 import { History } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 const DeadlineOver = () => {
   const router = useRouter();

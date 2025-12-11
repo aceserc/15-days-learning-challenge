@@ -27,7 +27,7 @@ import toast from "react-hot-toast";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { parseError } from "@/lib/parse-error";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
