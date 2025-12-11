@@ -11,10 +11,5 @@ export const CHALLANGE_DATA = {
       logo: "",
     },
   ],
-  myDetails: {
-    name: "ACES",
-    logo: "",
-    href: "",
-  },
   postHashtags: ["#aces", "#alc", "#techfest"],
 };
