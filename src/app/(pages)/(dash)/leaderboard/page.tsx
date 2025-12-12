@@ -1,14 +1,14 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -17,79 +17,130 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ComingSoon } from "@/components/coming-soon";
+import { cn } from "@/lib/utils";
+import { api } from "@/queries";
+import { LeaderboardWithUser } from "@/queries/leaderboard/action";
+import { Loader2 } from "lucide-react";
 
 export default function LeaderboardPage() {
-  return <ComingSoon />;
+  const { data, isLoading, error } = api.leaderboard.useGetLeaderboard();
 
-  // Mock data
-  const participants = [
+  //create mock data matching above type to render full ui
+  const mockLeaderboardWithUser: LeaderboardWithUser[] = [
     {
-      id: "1",
-      name: "Alice Johnson",
-      domain: "AI/ML",
-      streak: 10,
-      daysCompleted: 10,
-      isFirstPoster: true,
-      isDisqualified: false,
-      image: null,
+      userId: "user_001",
+      currentStreak: 5,
+      latestDay: 12,
+      totalSubmissions: 48,
+      rank: 1,
+      techfestId: "tf_2025_01",
+      updatedAt: new Date(),
+
+      name: "आदित्य श्रेष्ठ",
+      email: "aaditya@example.com",
+      image: "https://example.com/avatar1.png",
+      domain: "Software Engineering",
     },
     {
-      id: "2",
-      name: "Bob Smith",
-      domain: "Web Development",
-      streak: 10,
-      daysCompleted: 10,
-      isFirstPoster: false,
-      isDisqualified: false,
-      image: null,
+      userId: "user_002",
+      currentStreak: 4,
+      latestDay: 12,
+      totalSubmissions: 45,
+      rank: 2,
+      techfestId: "tf_2025_01",
+      updatedAt: new Date(),
+
+      name: "सुनिता थापा",
+      email: "sunita@example.com",
+      image: "https://example.com/avatar2.png",
+      domain: "AI & ML",
     },
     {
-      id: "3",
-      name: "Charlie Brown",
+      userId: "user_003",
+      currentStreak: 3,
+      latestDay: 11,
+      totalSubmissions: 40,
+      rank: 3,
+      techfestId: "tf_2025_01",
+      updatedAt: new Date(),
+
+      name: "बिबेक गुरुङ",
+      email: "bibek@example.com",
+      image: "https://example.com/avatar3.png",
       domain: "Cybersecurity",
-      streak: 9,
-      daysCompleted: 9,
-      isFirstPoster: false,
-      isDisqualified: false,
-      image: null,
     },
     {
-      id: "4",
-      name: "Diana Prince",
-      domain: "App Development",
-      streak: 8,
-      daysCompleted: 8,
-      isFirstPoster: false,
-      isDisqualified: false,
-      image: null,
+      userId: "user_004",
+      currentStreak: 2,
+      latestDay: 10,
+      totalSubmissions: 32,
+      rank: 4,
+      techfestId: "tf_2025_01",
+      updatedAt: new Date(),
+
+      name: "अनिता भण्डारी",
+      email: "anita@example.com",
+      image: "https://example.com/avatar4.png",
+      domain: "Cloud Computing",
     },
     {
-      id: "5",
-      name: "Eve Wilson",
-      domain: "Web Development",
-      streak: 0,
-      daysCompleted: 5,
-      isFirstPoster: false,
-      isDisqualified: true,
-      image: null,
-    },
+      userId: "user_005",
+      currentStreak: 1,
+      latestDay: 9,
+      totalSubmissions: 28,
+      rank: 5,
+      techfestId: "tf_2025_01",
+      updatedAt: new Date(),
+
+      name: "प्रकाश अधिकारी",
+      email: "prakash@example.com",
+      image: "https://example.com/avatar5.png",
+      domain: "DevOps",
+    }
   ];
 
-  const activeParticipants = participants.filter((p) => !p.isDisqualified);
-  const disqualifiedParticipants = participants.filter((p) => p.isDisqualified);
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (error || !data?.success) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-destructive">
+          Failed to load leaderboard. Please try again later.
+        </p>
+      </div>
+    );
+  }
+
+  const participants = data.data || [];
+  // const participants = mockLeaderboardWithUser;
+
+
+  const top3 = participants.slice(0, 3);
+  const others = participants.slice(3);
+
+  // Helper to re-arrange top 3 for podium: 2nd, 1st, 3rd
+  const podiumOrder = [
+    top3[1], // 2nd place
+    top3[0], // 1st place
+    top3[2], // 3rd place
+  ].filter(Boolean); // Filter out undefined if fewer than 3 participants
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-8 max-w-6xl">
-        <div className="space-y-6">
+      <div className="container mx-auto p-4 md:p-8 max-w-5xl">
+        <div className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">Leaderboard 🏆</h1>
               <p className="text-muted-foreground">
-                See how everyone is performing in the challenge
+                Top performers of the challenge
               </p>
             </div>
             <Button
@@ -100,164 +151,121 @@ export default function LeaderboardPage() {
             </Button>
           </div>
 
-          {/* Stats */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Total Participants</CardDescription>
-                <CardTitle className="text-3xl">
-                  {participants.length}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Active</CardDescription>
-                <CardTitle className="text-3xl text-green-600">
-                  {activeParticipants.length}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardDescription>Disqualified</CardDescription>
-                <CardTitle className="text-3xl text-destructive">
-                  {disqualifiedParticipants.length}
-                </CardTitle>
-              </CardHeader>
-            </Card>
-          </div>
+          {/* Podium Section */}
+          {podiumOrder.length > 0 && (
+            <div className="flex items-end justify-center gap-4 min-h-[300px] py-8">
+              {podiumOrder.map((participant, index) => {
+                if (!participant) return null;
 
-          {/* Active Participants Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Participants</CardTitle>
-              <CardDescription>
-                Sorted by streak (highest first), then by earliest submission
-                time
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-16">Rank</TableHead>
-                    <TableHead>Participant</TableHead>
-                    <TableHead>Domain</TableHead>
-                    <TableHead className="text-center">Streak</TableHead>
-                    <TableHead className="text-center">Days</TableHead>
-                    <TableHead className="text-center">Badges</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activeParticipants.map((participant, index) => (
-                    <TableRow
-                      key={participant.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                    >
-                      <TableCell className="font-medium">
-                        {index === 0 && "🥇"}
-                        {index === 1 && "🥈"}
-                        {index === 2 && "🥉"}
-                        {index > 2 && `#${index + 1}`}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage src={participant.image || undefined} />
-                            <AvatarFallback>
-                              {participant.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">
-                              {participant.name}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              View Profile →
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{participant.domain}</Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <span className="text-lg">🔥 {participant.streak}</span>
-                      </TableCell>
-                      <TableCell className="text-center font-medium">
-                        {participant.daysCompleted}/15
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {participant.isFirstPoster && (
-                          <Badge
-                            variant="default"
-                            className="bg-gradient-to-r from-yellow-500 to-orange-500"
-                          >
-                            ⚡ First Poster
-                          </Badge>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                // Determine styling based on ACTUAL rank (which matches array position logic)
+                // BUT we re-ordered the array.
+                // top3[1] is rank 2. top3[0] is rank 1. top3[2] is rank 3.
 
-          {/* Disqualified Participants */}
-          {disqualifiedParticipants.length > 0 && (
+                const isFirst = participant === top3[0];
+                const isSecond = participant === top3[1];
+                const isThird = participant === top3[2];
+
+                return (
+                  <div
+                    key={participant.userId}
+                    className={cn(
+                      "relative flex flex-col items-center p-4 rounded-t-lg transition-all md:w-48 w-1/3",
+                      isFirst ? "bg-primary/10 h-64 border-t-4 border-yellow-500" :
+                        isSecond ? "bg-muted/50 h-52 border-t-4 border-gray-400" :
+                          "bg-muted/30 h-44 border-t-4 border-amber-700"
+                    )}
+                  >
+                    {/* Medal / Badge */}
+                    <div className="absolute -top-6">
+                      {isFirst && <span className="text-4xl">🥇</span>}
+                      {isSecond && <span className="text-4xl">🥈</span>}
+                      {isThird && <span className="text-4xl">🥉</span>}
+                    </div>
+
+                    {/* Content */}
+                    <div className="mt-8 text-center flex flex-col items-center gap-2">
+                      <Avatar className={cn("border-2",
+                        isFirst ? "w-16 h-16 border-yellow-500" :
+                          isSecond ? "w-14 h-14 border-gray-400" :
+                            "w-12 h-12 border-amber-700"
+                      )}>
+                        <AvatarImage src={participant.image || undefined} />
+                        <AvatarFallback>
+                          {participant.name?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="font-bold truncate max-w-full px-2" title={participant.name || ""}>
+                        {participant.name?.split(" ")[0]}
+                      </div>
+
+                      <Badge variant={isFirst ? "default" : "secondary"}>
+                        🔥 {participant.currentStreak}
+                      </Badge>
+
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {participant.totalSubmissions} days
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* List for the rest */}
+          {others.length > 0 ? (
             <Card>
               <CardHeader>
-                <CardTitle>Disqualified Participants</CardTitle>
-                <CardDescription>
-                  Participants who missed a day or were disqualified
-                </CardDescription>
+                <CardTitle>All Participants</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-16">Rank</TableHead>
                       <TableHead>Participant</TableHead>
                       <TableHead>Domain</TableHead>
-                      <TableHead className="text-center">
-                        Days Completed
-                      </TableHead>
-                      <TableHead className="text-center">Status</TableHead>
+                      <TableHead className="text-center">Streak</TableHead>
+                      <TableHead className="text-center">Total Submissions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {disqualifiedParticipants.map((participant) => (
-                      <TableRow key={participant.id} className="opacity-60">
+                    {others.map((participant) => (
+                      <TableRow
+                        key={participant.userId}
+                        className="hover:bg-muted/50"
+                      >
+                        <TableCell className="font-medium text-muted-foreground">
+                          #{participant.rank}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar>
-                              <AvatarImage
-                                src={participant.image || undefined}
-                              />
+                              <AvatarImage src={participant.image || undefined} />
                               <AvatarFallback>
-                                {participant.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
+                                {participant.name?.[0]}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-medium">
-                              {participant.name}
-                            </span>
+                            <div>
+                              <div className="font-medium">
+                                {participant.name || "Anonymous"}
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">{participant.domain}</Badge>
+                          <Badge variant="outline">
+                            {participant.domain || "N/A"}
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          {participant.daysCompleted}/15
+                          <span className="font-mono font-bold">
+                            {participant.currentStreak}
+                          </span>
                         </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="destructive">Disqualified</Badge>
+                        <TableCell className="text-center text-muted-foreground">
+                          {participant.totalSubmissions}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -265,6 +273,10 @@ export default function LeaderboardPage() {
                 </Table>
               </CardContent>
             </Card>
+          ) : (
+            <div className="text-center text-muted-foreground py-8">
+              {participants.length === 0 ? "No participants yet." : ""}
+            </div>
           )}
         </div>
       </div>

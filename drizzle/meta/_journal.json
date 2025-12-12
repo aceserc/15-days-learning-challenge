@@ -43,6 +43,13 @@
       "when": 1765455738096,
       "tag": "0005_smart_inertia",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1765509352157,
+      "tag": "0006_lush_queen_noir",
+      "breakpoints": true
     }
   ]
 }

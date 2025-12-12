@@ -1,0 +1,162 @@
+"use server";
+
+import { db } from "@/db";
+import { leaderboard, participants, submissions, users } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
+import { tryCatchAction } from "../lib";
+import { ActionResponse } from "../types";
+
+function calculateCurrentStreak(days: number[]): number {
+  if (days.length === 0) return 0;
+
+  const sorted = [...days].sort((a, b) => b - a); // newest first
+
+  let streak = 1;
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i - 1] - sorted[i] === 1) {
+      streak++;
+    } else {
+      break; // Stop as soon as we find a gap — we only care about the current streak
+    }
+  }
+
+  return streak;
+}
+
+export const updateLeaderboard = tryCatchAction(
+  async (techfestId?: string): Promise<ActionResponse> => {
+    // 1. Fetch all submissions (no transaction needed)
+    const allSubmissions = await db
+      .select({
+        userId: submissions.userId,
+        day: submissions.day,
+      })
+      .from(submissions)
+      .where(techfestId ? eq(submissions.techfestId, techfestId) : sql`true`)
+      .orderBy(submissions.day);
+
+    // 2. Group by user and compute stats + streak
+    const userMap = new Map<
+      string,
+      { days: number[]; latestDay: number; totalSubmissions: number }
+    >();
+
+    for (const sub of allSubmissions) {
+      if (!userMap.has(sub.userId)) {
+        userMap.set(sub.userId, {
+          days: [],
+          latestDay: 0,
+          totalSubmissions: 0,
+        });
+      }
+
+      const entry = userMap.get(sub.userId)!;
+      entry.days.push(sub.day);
+      entry.totalSubmissions += 1;
+      entry.latestDay = Math.max(entry.latestDay, sub.day);
+    }
+
+    // 3. Compute leaderboard data
+    const leaderboardData = Array.from(userMap.entries()).map(
+      ([userId, { days, latestDay, totalSubmissions }]) => {
+        const currentStreak = calculateCurrentStreak(days);
+
+        return {
+          userId,
+          currentStreak,
+          latestDay,
+          totalSubmissions,
+        };
+      }
+    );
+
+    // 4. Sort: highest streak first, then latest day
+    leaderboardData.sort((a, b) => {
+      if (b.currentStreak !== a.currentStreak) {
+        return b.currentStreak - a.currentStreak;
+      }
+      return b.latestDay - a.latestDay;
+    });
+
+    // 5. Prepare insert data
+    const ranked = leaderboardData.map((item, index) => ({
+      userId: item.userId,
+      currentStreak: item.currentStreak,
+      latestDay: item.latestDay,
+      totalSubmissions: item.totalSubmissions,
+      rank: index + 1,
+      techfestId: techfestId ?? "global",
+      updatedAt: new Date(),
+    }));
+
+    // 6. Delete old leaderboard entries (safe on Neon)
+    await db.delete(leaderboard).where(
+      techfestId ? eq(leaderboard.techfestId, techfestId) : sql`true`
+    );
+
+    // 7. Insert new leaderboard (atomic enough for this use case)
+    if (ranked.length > 0) {
+      await db.insert(leaderboard).values(ranked);
+    }
+
+    return {
+      success: true,
+      message: "Leaderboard updated successfully",
+    };
+  }
+);
+
+export type LeaderboardWithUser = {
+  userId: string;
+  currentStreak: number;
+  latestDay: number;
+  totalSubmissions: number;
+  rank: number;
+  techfestId: string;
+  updatedAt: Date;
+
+  // User details from join
+  name: string | null;
+  email: string | null;
+  image: string | null; // avatar URL
+  domain: string | null;
+  // Add any other user fields you want
+};
+
+export const getLeaderboard = tryCatchAction(
+  async (techfestId?: string): Promise<ActionResponse<LeaderboardWithUser[]>> => {
+    const leaderboardData = await db
+      .select({
+        // Leaderboard columns
+        userId: leaderboard.userId,
+        currentStreak: leaderboard.currentStreak,
+        latestDay: leaderboard.latestDay,
+        totalSubmissions: leaderboard.totalSubmissions,
+        rank: leaderboard.rank,
+        techfestId: leaderboard.techfestId,
+        updatedAt: leaderboard.updatedAt,
+
+        // User columns
+        name: users.name,
+        email: users.email,
+        image: users.image,
+
+        // Participation columns
+        domain: participants.domain,
+      })
+      .from(leaderboard)
+      .leftJoin(users, eq(leaderboard.userId, users.id))
+      .leftJoin(participants, eq(leaderboard.userId, participants.userId))
+      .where(
+        techfestId ? eq(leaderboard.techfestId, techfestId) : sql`true`
+      )
+      .orderBy(sql`leaderboard.rank ASC`);
+
+    return {
+      success: true,
+      message: "Leaderboard fetched successfully",
+      data: leaderboardData as LeaderboardWithUser[],
+    };
+  }
+);
