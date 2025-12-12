@@ -56,8 +56,6 @@ type FormValues = z.infer<typeof formSchema>;
 export const SubmitForm = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const submit = api.submissions.useSubmitDailyChallenge();
-  //TODO: This is the temporary solution will fix later
-  const updateLeaderboard = api.leaderboard.useUpdateLeaderboard();
   const { data: submissions } = api.submissions.useGetMySubmissions();
   const router = useRouter();
 
@@ -95,8 +93,6 @@ export const SubmitForm = () => {
       });
 
       toast.success(res.message);
-      const leaderboard = await updateLeaderboard.mutateAsync(CHALLANGE_DATA.techfestId);
-      toast.success(leaderboard.message);
       form.reset();
       router.push("?tab=my-submissions");
       setStep(1);
