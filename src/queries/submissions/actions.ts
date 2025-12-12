@@ -1,20 +1,21 @@
 "use server";
 
+import { CHALLANGE_DATA } from "@/content/data";
 import { db } from "@/db";
 import {
+  Participant,
   participants,
   Submission,
   submissions,
   users,
   votes,
 } from "@/db/schema";
-import { and, eq, inArray, desc, sql } from "drizzle-orm";
-import { ActionResponse } from "../types";
-import { CHALLANGE_DATA } from "@/content/data";
 import { differenceInDays, startOfDay } from "date-fns";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { User } from "next-auth";
 import { tryCatchAction } from "../lib";
 import { getAuth } from "../middlewares/require-auth";
-import { User } from "next-auth";
+import { ActionResponse } from "../types";
 
 export type DailySubmission = {
   day: number;
@@ -168,15 +169,17 @@ export const getFeedSubmissions = tryCatchAction(
     limit: number = 20
   ): Promise<
     ActionResponse<{
-      submissions: SubmissionWithUser[];
+      submissions: (SubmissionWithUser & { participant?: Participant })[];
       hasMore: boolean;
     }>
   > => {
     const user = await getAuth();
     const offset = (page - 1) * limit;
 
+    // Fetch submissions + user + participant in one query
     const data = await db
       .select({
+        // Submission fields
         id: submissions.id,
         userId: submissions.userId,
         day: submissions.day,
@@ -186,13 +189,22 @@ export const getFeedSubmissions = tryCatchAction(
         techfestId: submissions.techfestId,
         voteCount: submissions.voteCount,
         user: {
+          id: users.id,
           name: users.name,
           image: users.image,
-          id: users.id,
+        },
+        participant: {
+          id: participants.id,
+          domain: participants.domain,
+          createdAt: participants.createdAt,
         },
       })
       .from(submissions)
       .leftJoin(users, eq(submissions.userId, users.id))
+      .leftJoin(participants, and(
+        eq(submissions.userId, participants.userId),
+        eq(submissions.techfestId, participants.techfestId)
+      ))
       .where(eq(submissions.techfestId, CHALLANGE_DATA.techfestId))
       .orderBy(desc(submissions.createdAt))
       .limit(limit + 1)
@@ -221,25 +233,26 @@ export const getFeedSubmissions = tryCatchAction(
         )
       );
 
-    const enrichedData = slicedData.map((sub) => {
-      const vote = myVotes.find((v) => v.submissionId === sub.id);
+    const enrichedData = slicedData.map((row) => {
+      const vote = myVotes.find((v) => v.submissionId === row.id);
+
       return {
-        ...sub,
+        ...row,
         userVote: vote ? (vote.type as "up" | "down") : null,
+        participant: row.participant?.id ? row.participant : undefined,
       };
     });
 
     return {
       success: true,
       data: {
-        submissions: enrichedData as SubmissionWithUser[],
+        submissions: enrichedData as (SubmissionWithUser & { participant?: Participant })[],
         hasMore,
       },
       message: "Feed fetched",
     };
   }
 );
-
 export const voteSubmission = tryCatchAction(
   async (
     submissionId: string,
@@ -271,9 +284,8 @@ export const voteSubmission = tryCatchAction(
         await db
           .update(submissions)
           .set({
-            voteCount: sql`${submissions.voteCount} - ${
-              type === "up" ? 1 : -1
-            }`,
+            voteCount: sql`${submissions.voteCount} - ${type === "up" ? 1 : -1
+              }`,
           })
           .where(eq(submissions.id, submissionId));
         return { success: true, message: "Vote removed" };
@@ -293,9 +305,8 @@ export const voteSubmission = tryCatchAction(
         await db
           .update(submissions)
           .set({
-            voteCount: sql`${submissions.voteCount} + ${
-              type === "up" ? 2 : -2
-            }`,
+            voteCount: sql`${submissions.voteCount} + ${type === "up" ? 2 : -2
+              }`,
           })
           .where(eq(submissions.id, submissionId));
         return { success: true, message: "Vote updated" };

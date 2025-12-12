@@ -1,6 +1,8 @@
 "use client";
 
+import { confirm } from "@/components/ui/alert-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,24 +10,24 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Participant, Submission } from "@/db/schema";
+import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
+import { api } from "@/queries";
 import { voteSubmission } from "@/queries/submissions/actions";
 import { formatRelative } from "date-fns";
 import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
+import { User } from "next-auth";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { confirm } from "@/components/ui/alert-utils";
-import { Submission } from "@/db/schema";
-import { User } from "next-auth";
-import { api } from "@/queries";
-import { parseError } from "@/lib/parse-error";
 
 interface PostCardProps {
   submission: Submission & {
     user: User;
     userVote?: "up" | "down" | null;
+    participant?: Participant;
   };
 }
 
@@ -118,9 +120,16 @@ export const PostCard = ({
           </Avatar>
         </Link>
         <div className="flex flex-col flex-1">
-          <Link href={`/u/${user?.id}`} className="hover:underline w-fit">
-            {user?.name || "Unknown User"}
-          </Link>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link href={`/u/${user?.id}`} className="hover:underline font-medium">
+              {user?.name || "Unknown User"}
+            </Link>
+            {submission.participant?.domain && (
+              <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground">
+                {submission.participant.domain}
+              </Badge>
+            )}
+          </div>
           <span className="text-sm text-muted-foreground">
             Day {submission.day} •{" "}
             {formatRelative(new Date(submission.createdAt), new Date())}
@@ -185,3 +194,4 @@ export const PostCard = ({
     </Card>
   );
 };
+
