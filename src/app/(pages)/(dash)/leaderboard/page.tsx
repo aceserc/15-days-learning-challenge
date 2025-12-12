@@ -1,5 +1,6 @@
 "use client";
 
+import { alert } from "@/components/ui/alert-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
+import { Loading } from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -17,95 +19,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DOMAINS } from "@/content/domains";
+import { getCurrentDayNumber } from "@/lib/event";
 import { cn } from "@/lib/utils";
 import { api } from "@/queries";
-import { LeaderboardWithUser } from "@/queries/leaderboard/action";
-import { Loader2 } from "lucide-react";
+import { Info } from "lucide-react";
+import Link from "next/link";
 
 export default function LeaderboardPage() {
   const { data, isLoading, error } = api.leaderboard.useGetLeaderboard();
 
-  //create mock data matching above type to render full ui
-  const mockLeaderboardWithUser: LeaderboardWithUser[] = [
-    {
-      userId: "user_001",
-      currentStreak: 5,
-      latestDay: 12,
-      totalSubmissions: 48,
-      rank: 1,
-      techfestId: "tf_2025_01",
-      updatedAt: new Date(),
-
-      name: "आदित्य श्रेष्ठ",
-      email: "aaditya@example.com",
-      image: "https://example.com/avatar1.png",
-      domain: "Software Engineering",
-    },
-    {
-      userId: "user_002",
-      currentStreak: 4,
-      latestDay: 12,
-      totalSubmissions: 45,
-      rank: 2,
-      techfestId: "tf_2025_01",
-      updatedAt: new Date(),
-
-      name: "सुनिता थापा",
-      email: "sunita@example.com",
-      image: "https://example.com/avatar2.png",
-      domain: "AI & ML",
-    },
-    {
-      userId: "user_003",
-      currentStreak: 3,
-      latestDay: 11,
-      totalSubmissions: 40,
-      rank: 3,
-      techfestId: "tf_2025_01",
-      updatedAt: new Date(),
-
-      name: "बिबेक गुरुङ",
-      email: "bibek@example.com",
-      image: "https://example.com/avatar3.png",
-      domain: "Cybersecurity",
-    },
-    {
-      userId: "user_004",
-      currentStreak: 2,
-      latestDay: 10,
-      totalSubmissions: 32,
-      rank: 4,
-      techfestId: "tf_2025_01",
-      updatedAt: new Date(),
-
-      name: "अनिता भण्डारी",
-      email: "anita@example.com",
-      image: "https://example.com/avatar4.png",
-      domain: "Cloud Computing",
-    },
-    {
-      userId: "user_005",
-      currentStreak: 1,
-      latestDay: 9,
-      totalSubmissions: 28,
-      rank: 5,
-      techfestId: "tf_2025_01",
-      updatedAt: new Date(),
-
-      name: "प्रकाश अधिकारी",
-      email: "prakash@example.com",
-      image: "https://example.com/avatar5.png",
-      domain: "DevOps",
-    }
-  ];
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <Loading className="py-12">
+      Getting leaderboard
+    </Loading>
   }
+
 
   if (error || !data?.success) {
     return (
@@ -118,7 +48,6 @@ export default function LeaderboardPage() {
   }
 
   const participants = data.data || [];
-  // const participants = mockLeaderboardWithUser;
 
 
   const top3 = participants.slice(0, 3);
@@ -137,18 +66,33 @@ export default function LeaderboardPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Leaderboard 🏆</h1>
-              <p className="text-muted-foreground">
-                Top performers of the challenge
-              </p>
+            <div className="flex items-center">
+              <h1 className="text-xl sm:text-3xl font-bold">Leaderboard – Top Performers 🏆</h1>
+              <Button
+                onClick={() => {
+                  alert({
+                    title: "Info",
+                    variant: "default",
+                    actionText: "OK, Got it!",
+                    description: (
+                      <>
+
+                        <p className="text-muted-foreground text-lg">
+                          It includes top performance stats, and the list is updated every hour.
+                          <br />
+                          The rankings are calculated based on your streak and the submission order (who submitted earlier).
+                          Being first or last on the leaderboard doesn’t mean much—it’s mainly for general reference.
+                          <br />
+                          The only thing that truly matters is keeping your 15-day streak.
+                        </p>
+                      </>
+                    )
+                  })
+                }}
+                variant={"outline"} size={"icon"} className="ml-4 text-muted-foreground shadow-none">
+                <Info />
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => (window.location.href = "/home")}
-            >
-              ← Back to Home
-            </Button>
           </div>
 
           {/* Podium Section */}
@@ -240,7 +184,7 @@ export default function LeaderboardPage() {
                           #{participant.rank}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-3">
+                          <Link href={`/u/${participant.userId}`} className="flex items-center gap-3">
                             <Avatar>
                               <AvatarImage src={participant.image || undefined} />
                               <AvatarFallback>
@@ -252,15 +196,15 @@ export default function LeaderboardPage() {
                                 {participant.name || "Anonymous"}
                               </div>
                             </div>
-                          </div>
+                          </Link>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">
-                            {participant.domain || "N/A"}
+                            {DOMAINS.find((d) => d.id === participant.domain)?.title || "N/A"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <span className="font-mono font-bold">
+                          <span className={cn("font-mono font-bold", getCurrentDayNumber() > participant.currentStreak, "text-destructive")}>
                             {participant.currentStreak}
                           </span>
                         </TableCell>

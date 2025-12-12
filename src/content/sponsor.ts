@@ -6,4 +6,5 @@ export const SPONSOR = {
   tagline: "Empowering Schools, Teachers, and Students, Together.",
   banner: "",
   logo: "",
+  linkeinUrl: "https://www.linkedin.com/company/nativesplug/",
 };

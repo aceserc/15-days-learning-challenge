@@ -24,13 +24,18 @@ function calculateCurrentStreak(days: number[]): number {
   return streak;
 }
 
+
 export const updateLeaderboard = tryCatchAction(
   async (techfestId?: string): Promise<ActionResponse> => {
+    const today = new Date();
+    const todayDateString = today.toISOString().split("T")[0]; // e.g., 2025-12-12
+
     // 1. Fetch all submissions (no transaction needed)
     const allSubmissions = await db
       .select({
         userId: submissions.userId,
         day: submissions.day,
+        createdAt: submissions.createdAt, // we need submission timestamp for "earlier submission"
       })
       .from(submissions)
       .where(techfestId ? eq(submissions.techfestId, techfestId) : sql`true`)
@@ -39,14 +44,14 @@ export const updateLeaderboard = tryCatchAction(
     // 2. Group by user and compute stats + streak
     const userMap = new Map<
       string,
-      { days: number[]; latestDay: number; totalSubmissions: number }
+      { days: number[]; earliestSubmission: Date; totalSubmissions: number }
     >();
 
     for (const sub of allSubmissions) {
       if (!userMap.has(sub.userId)) {
         userMap.set(sub.userId, {
           days: [],
-          latestDay: 0,
+          earliestSubmission: sub.createdAt,
           totalSubmissions: 0,
         });
       }
@@ -54,29 +59,33 @@ export const updateLeaderboard = tryCatchAction(
       const entry = userMap.get(sub.userId)!;
       entry.days.push(sub.day);
       entry.totalSubmissions += 1;
-      entry.latestDay = Math.max(entry.latestDay, sub.day);
+      if (sub.createdAt < entry.earliestSubmission) {
+        entry.earliestSubmission = sub.createdAt; // track first submission
+      }
     }
 
     // 3. Compute leaderboard data
     const leaderboardData = Array.from(userMap.entries()).map(
-      ([userId, { days, latestDay, totalSubmissions }]) => {
+      ([userId, { days, earliestSubmission, totalSubmissions }]) => {
         const currentStreak = calculateCurrentStreak(days);
+        const latestDay = Math.max(...days);
 
         return {
           userId,
           currentStreak,
           latestDay,
           totalSubmissions,
+          earliestSubmission,
         };
       }
     );
 
-    // 4. Sort: highest streak first, then latest day
+    // 4. Sort by streak descending, then earliest submission ascending
     leaderboardData.sort((a, b) => {
       if (b.currentStreak !== a.currentStreak) {
         return b.currentStreak - a.currentStreak;
       }
-      return b.latestDay - a.latestDay;
+      return a.earliestSubmission.getTime() - b.earliestSubmission.getTime();
     });
 
     // 5. Prepare insert data
@@ -87,15 +96,32 @@ export const updateLeaderboard = tryCatchAction(
       totalSubmissions: item.totalSubmissions,
       rank: index + 1,
       techfestId: techfestId ?? "global",
-      updatedAt: new Date(),
+      updatedAt: today,
+      date: todayDateString, // store the day of this leaderboard snapshot
     }));
 
-    // 6. Delete old leaderboard entries (safe on Neon)
-    await db.delete(leaderboard).where(
-      techfestId ? eq(leaderboard.techfestId, techfestId) : sql`true`
-    );
+    // 6. Check last leaderboard for today
+    const existingToday = await db
+      .select({ id: leaderboard.id })
+      .from(leaderboard)
+      .where(
+        techfestId
+          ? sql`${leaderboard.techfestId} = ${techfestId} AND ${leaderboard.date} = ${todayDateString}`
+          : sql`${leaderboard.date} = ${todayDateString}`
+      );
 
-    // 7. Insert new leaderboard (atomic enough for this use case)
+    if (existingToday.length > 0) {
+      // Delete today’s old leaderboard
+      await db
+        .delete(leaderboard)
+        .where(
+          techfestId
+            ? sql`${leaderboard.techfestId} = ${techfestId} AND ${leaderboard.date} = ${todayDateString}`
+            : sql`${leaderboard.date} = ${todayDateString}`
+        );
+    }
+
+    // 7. Insert new leaderboard for today
     if (ranked.length > 0) {
       await db.insert(leaderboard).values(ranked);
     }
@@ -106,7 +132,6 @@ export const updateLeaderboard = tryCatchAction(
     };
   }
 );
-
 export type LeaderboardWithUser = {
   userId: string;
   currentStreak: number;

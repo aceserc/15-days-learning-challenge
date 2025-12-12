@@ -4,7 +4,7 @@ import { Heart } from "lucide-react";
 
 const SponsorCard = () => {
   return (
-    <Card className="min-w-xs overflow-hidden border-2 border-primary/10 bg-gradient-to-br from-card to-card/50 hover:shadow-lg transition-all duration-300 hover:border-primary/20">
+    <Card className="gap-0! min-w-xs overflow-hidden border-2 border-primary/10 bg-gradient-to-br from-card to-card/50 hover:shadow-lg transition-all duration-300 hover:border-primary/20">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <Heart className="h-4 w-4 fill-primary text-primary" />

@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, } from "@tanstack/react-query";
 import { serverAction } from "../lib";
-import { getLeaderboard, updateLeaderboard } from "./action";
+import { getLeaderboard, } from "./action";
 
 export const useGetLeaderboard = () => {
   return useQuery({
@@ -10,14 +10,3 @@ export const useGetLeaderboard = () => {
 }
 
 
-export const useUpdateLeaderboard = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: serverAction(updateLeaderboard),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getLeaderboard"],
-      });
-    },
-  });
-}

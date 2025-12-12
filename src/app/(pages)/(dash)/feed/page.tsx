@@ -4,7 +4,7 @@ import { SponsorCard } from "@/components/sponsor-card";
 export default function FeedPage() {
   return (
     <div className="container max-w-7xl py-6 mx-auto">
-      <div className="flex gap-8">
+      <div className="flex gap-8 @3xl:flex-row flex-col-reverse">
         <div className="space-y-6 flex-1">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold tracking-tight">
@@ -13,7 +13,7 @@ export default function FeedPage() {
           </div>
           <FeedList />
         </div>
-        <div className="mt-20">
+        <div className="@3xl:mt-16">
           <SponsorCard />
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { DOMAINS } from "@/content/domains";
 import { Participant, Submission } from "@/db/schema";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
@@ -125,8 +126,8 @@ export const PostCard = ({
               {user?.name || "Unknown User"}
             </Link>
             {submission.participant?.domain && (
-              <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal text-muted-foreground">
-                {submission.participant.domain}
+              <Badge variant="outline" className="text-sm h-5 px-1.5 font-normal text-muted-foreground">
+                {DOMAINS.find((d) => d.id === submission.participant?.domain)?.title}
               </Badge>
             )}
           </div>
@@ -148,7 +149,7 @@ export const PostCard = ({
         )}
       </CardHeader>
       <CardContent className="px-4">
-        <p className="text-sm whitespace-pre-wrap leading-relaxed bg-muted p-2 rounded-md">
+        <p className="text-md whitespace-pre-wrap leading-relaxed bg-muted p-2 rounded-md">
           {submission.summary}
         </p>
       </CardContent>

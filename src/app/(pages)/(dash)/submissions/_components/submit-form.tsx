@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { api } from "@/queries";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, FlaskConical, Link as LinkIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "nextjs-toploader/app";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -32,7 +33,9 @@ import { z } from "zod";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
-  link: z.string().url("Please enter a valid URL."),
+  link: z.string().url("Please enter a valid URL.").includes("linkedin.com/posts", {
+    error: "Please enter a valid linkedin post URL"
+  }),
   summary: z.string().min(10, "Summary must be at least 10 characters."),
   verifyHashtags: z.boolean().refine((val) => val === true, {
     message: "You must use the required hashtags.",
@@ -171,6 +174,17 @@ export const SubmitForm = () => {
                       previous submission and submit again.
                     </FormDescription>
                     <FormMessage />
+
+                    <Card className="p-2! text-muted-foreground text-sm">
+                      <p>
+
+                        If you’re confused about what to write, what things to include, or which tags to use, you can see a sample post <Link className="text-primary underline inline" href={"/sample.jpeg"} target="_blank">
+                          here
+
+                        </Link>.
+                      </p>
+                    </Card>
+
                     <Button
                       type="button"
                       onClick={handleNext}
@@ -243,7 +257,7 @@ export const SubmitForm = () => {
                           <FormLabel className="font-normal cursor-pointer">
                             I have mentioned{" "}
                             <a
-                              href={SPONSOR.href}
+                              href={SPONSOR.linkeinUrl}
                               target="_blank"
                               className="font-medium text-primary hover:underline underline-offset-4"
                               rel="noreferrer"
@@ -272,7 +286,7 @@ export const SubmitForm = () => {
                           <FormLabel className="font-normal cursor-pointer">
                             I have mentioned{" "}
                             <a
-                              href={APP_CONFIG.href}
+                              href={APP_CONFIG.linkedinUrl}
                               target="_blank"
                               className="font-medium text-primary hover:underline underline-offset-4"
                               rel="noreferrer"

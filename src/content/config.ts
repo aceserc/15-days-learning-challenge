@@ -1,5 +1,6 @@
 export const APP_CONFIG = {
   logo: "/logo.png",
   name: "ACES",
-  href: "",
+  href: "https://aceserc.org",
+  linkedinUrl: "https://www.linkedin.com/company/acesioe-pc"
 };

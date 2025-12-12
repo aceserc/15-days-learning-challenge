@@ -1,4 +1,5 @@
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import { integer, pgTable, text, timestamp, date } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 
 export const leaderboard = pgTable("leaderboard", {
@@ -16,12 +17,5 @@ export const leaderboard = pgTable("leaderboard", {
   updatedAt: timestamp("updatedAt", { withTimezone: true })
     .defaultNow()
     .notNull(),
+  date: date("date").notNull(), // <-- new column to store leaderboard snapshot date
 });
-// export const leaderboardIndexes = [
-//   // Fast leaderboard queries
-//   pgIndex("leaderboard_rank_idx").on(leaderboard.rank),
-//   pgIndex("leaderboard_techfest_rank_idx").on(leaderboard.techfestId, leaderboard.rank),
-//   // Fast lookup by user
-//   pgIndex("leaderboard_user_idx").on(leaderboard.userId),
-// ];
-export type Leaderboard = typeof leaderboard.$inferSelect;

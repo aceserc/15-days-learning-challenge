@@ -63,7 +63,7 @@ const SubmissionsPage = () => {
         </Tabs>
       </div>
 
-      <div className="mt-18 hidden @3xl:block">
+      <div className="mt-20 hidden @3xl:block">
         <SponsorCard />
       </div>
     </div>
