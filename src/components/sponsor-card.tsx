@@ -1,35 +1,54 @@
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { SPONSOR } from "@/content/sponsor";
+import { Heart } from "lucide-react";
 
-interface SponsorCardProps {
-  name: string;
-  href?: string;
-  banner?: string;
-  logo?: string;
-}
-
-const SponsorCard = ({ name, href, logo }: SponsorCardProps) => {
+const SponsorCard = () => {
   return (
-    <Card className="min-w-xs overflow-hidden hover:shadow-md transition-shadow">
-      <CardContent className="p-0 flex items-center gap-4 bg-card/50">
-        <div className="h-16 w-16 shrink-0 bg-muted flex items-center justify-center">
-          {logo ? (
-            <img src={logo} alt={name} className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-xs text-muted-foreground">Logo</span>
-          )}
-        </div>
-        <div className="p-4 pl-0">
-          <p className="font-semibold">{name}</p>
-          {href && (
+    <Card className="min-w-xs overflow-hidden border-2 border-primary/10 bg-gradient-to-br from-card to-card/50 hover:shadow-lg transition-all duration-300 hover:border-primary/20">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <Heart className="h-4 w-4 fill-primary text-primary" />
+          Sponsored by
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <a
+            href={SPONSOR.href}
+            target="_blank"
+            rel="noreferrer"
+            className="block group"
+          >
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent group-hover:from-primary/80 group-hover:to-primary/40 transition-all">
+              {SPONSOR.name}
+            </h3>
+          </a>
+          <p className="text-xs text-muted-foreground">
+            by{" "}
             <a
-              href={href}
+              href={SPONSOR.byHref}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-muted-foreground hover:underline"
+              className="font-medium text-primary hover:underline underline-offset-2"
             >
-              Visit Website
+              {SPONSOR.byName}
             </a>
-          )}
+          </p>
+        </div>
+
+        <p className="text-sm text-muted-foreground leading-relaxed italic border-l-2 border-primary/30 pl-3">
+          {SPONSOR.tagline}
+        </p>
+
+        <div className="pt-2">
+          <a
+            href={SPONSOR.href}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center text-xs font-medium text-primary hover:text-primary/80 transition-colors underline underline-offset-4"
+          >
+            Learn more →
+          </a>
         </div>
       </CardContent>
     </Card>

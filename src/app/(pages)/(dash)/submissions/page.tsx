@@ -64,7 +64,7 @@ const SubmissionsPage = () => {
       </div>
 
       <div className="mt-18 hidden @3xl:block">
-        <SponsorCard name="UST" />
+        <SponsorCard />
       </div>
     </div>
   );
