@@ -285,8 +285,8 @@ export default function LeaderboardPage() {
                           <span
                             className={cn(
                               "font-mono font-bold",
-                              getCurrentDayNumber() > participant.currentStreak,
-                              "text-destructive",
+                              getCurrentDayNumber() >
+                                participant.currentStreak && "text-destructive",
                             )}
                           >
                             {participant.currentStreak}
