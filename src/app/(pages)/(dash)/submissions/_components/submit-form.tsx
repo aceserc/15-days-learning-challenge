@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -20,6 +21,7 @@ import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
+import { api } from "@/queries";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, FlaskConical, Link as LinkIcon } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
@@ -27,8 +29,6 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { api } from "@/queries";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
@@ -53,6 +53,8 @@ type FormValues = z.infer<typeof formSchema>;
 export const SubmitForm = () => {
   const [step, setStep] = useState<1 | 2>(1);
   const submit = api.submissions.useSubmitDailyChallenge();
+  //TODO: This is the temporary solution will fix later
+  const updateLeaderboard = api.leaderboard.useUpdateLeaderboard();
   const { data: submissions } = api.submissions.useGetMySubmissions();
   const router = useRouter();
 
@@ -90,6 +92,8 @@ export const SubmitForm = () => {
       });
 
       toast.success(res.message);
+      const leaderboard = await updateLeaderboard.mutateAsync(CHALLANGE_DATA.techfestId);
+      toast.success(leaderboard.message);
       form.reset();
       router.push("?tab=my-submissions");
       setStep(1);
@@ -143,9 +147,9 @@ export const SubmitForm = () => {
                                 className={cn(
                                   "relative flex cursor-pointer aspect-square flex-col items-center justify-center rounded-xl border-2 border-muted bg-card py-4 text-center transition-all hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary shadow-sm",
                                   isDisabled &&
-                                    "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
+                                  "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
                                   isSubmitted &&
-                                    "border-primary/20 bg-primary/5 text-primary opacity-60"
+                                  "border-primary/20 bg-primary/5 text-primary opacity-60"
                                 )}
                               >
                                 <span className="text-xl font-bold">{day}</span>
