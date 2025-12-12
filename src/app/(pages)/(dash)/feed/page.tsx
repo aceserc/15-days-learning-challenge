@@ -14,7 +14,7 @@ export default function FeedPage() {
           <FeedList />
         </div>
         <div className="mt-20">
-          <SponsorCard name="" />
+          <SponsorCard />
         </div>
       </div>
     </div>
