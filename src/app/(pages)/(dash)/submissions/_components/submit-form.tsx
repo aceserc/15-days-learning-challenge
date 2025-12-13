@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { APP_CONFIG } from "@/content/config";
+import { APP_CONFIG, TARANGA_CONFIG } from "@/content/config";
 import { CHALLANGE_DATA } from "@/content/data";
 import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
@@ -43,6 +43,9 @@ const formSchema = z.object({
   verifyMyDetails: z.boolean().refine((val) => val === true, {
     message: `You must mention ${APP_CONFIG.name} in your post.`,
   }),
+  verifyTaranga: z.boolean().refine((val) => val === true, {
+    message: `You must mention ${TARANGA_CONFIG.name} in your post.`,
+  }),
   verifyGuidelines: z.boolean().refine((val) => val === true, {
     message: "You must acknowledge the guidelines.",
   }),
@@ -68,6 +71,7 @@ export const SubmitForm = () => {
       verifyMyDetails: false,
       verifyGuidelines: false,
       verifySponsor: false,
+      verifyTaranga: false,
     },
   });
 
@@ -288,6 +292,35 @@ export const SubmitForm = () => {
                               rel="noreferrer"
                             >
                               {APP_CONFIG.name}
+                            </a>{" "}
+                            in my post.
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="verifyTaranga"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal cursor-pointer">
+                            I have mentioned{" "}
+                            <a
+                              href={TARANGA_CONFIG.href}
+                              target="_blank"
+                              className="font-medium text-primary hover:underline underline-offset-4"
+                              rel="noreferrer"
+                            >
+                              {TARANGA_CONFIG.name}
                             </a>{" "}
                             in my post.
                           </FormLabel>
