@@ -4,3 +4,8 @@ export const APP_CONFIG = {
   href: "https://aceserc.org",
   linkedinUrl: "https://www.linkedin.com/company/acesioe-pc"
 };
+export const TARANGA_CONFIG = {
+  name: "Taranga",
+  href: "https://taranga.ioepc.edu.np",
+  linkedinUrl: "https://taranga.ioepc.edu.np"
+};
