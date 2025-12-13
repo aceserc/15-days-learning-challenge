@@ -7,5 +7,5 @@ export const APP_CONFIG = {
 export const TARANGA_CONFIG = {
   name: "Taranga",
   href: "https://taranga.ioepc.edu.np",
-  linkedinUrl: "https://taranga.ioepc.edu.np"
+  linkedinUrl: "https://www.linkedin.com/company/taranga-ioe-purwanchal-campus"
 };
