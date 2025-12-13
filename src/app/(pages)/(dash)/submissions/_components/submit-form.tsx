@@ -49,6 +49,10 @@ const formSchema = z.object({
   verifySponsor: z.boolean().refine((val) => val === true, {
     message: "You must mention the sponsor.",
   }),
+  verifyTaranga: z.boolean().refine((val) => val === true, {
+    message: `You must mention ${APP_CONFIG.taranga.name} in your post.`,
+  }),
+
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,6 +72,7 @@ export const SubmitForm = () => {
       verifyMyDetails: false,
       verifyGuidelines: false,
       verifySponsor: false,
+      verifyTaranga: false
     },
   });
 
@@ -296,6 +301,34 @@ export const SubmitForm = () => {
                     )}
                   />
 
+                  <FormField
+                    control={form.control}
+                    name="verifyTaranga"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="font-normal cursor-pointer">
+                            I have mentioned{" "}
+                            <a
+                              href={APP_CONFIG.taranga.linkedinUrl}
+                              target="_blank"
+                              className="font-medium text-primary hover:underline underline-offset-4"
+                              rel="noreferrer"
+                            >
+                              {APP_CONFIG.taranga.name}
+                            </a>{" "}
+                            in my post.
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="verifyHashtags"
