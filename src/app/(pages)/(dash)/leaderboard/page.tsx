@@ -1,15 +1,12 @@
 "use client";
 
+import { Info } from "lucide-react";
+import Link from "next/link";
 import { alert } from "@/components/ui/alert-utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
 import {
   Table,
@@ -23,19 +20,13 @@ import { DOMAINS } from "@/content/domains";
 import { getCurrentDayNumber } from "@/lib/event";
 import { cn } from "@/lib/utils";
 import { api } from "@/queries";
-import { Info } from "lucide-react";
-import Link from "next/link";
 
 export default function LeaderboardPage() {
   const { data, isLoading, error } = api.leaderboard.useGetLeaderboard();
 
-
   if (isLoading) {
-    return <Loading className="py-12">
-      Getting leaderboard
-    </Loading>
+    return <Loading className="py-12">Getting leaderboard</Loading>;
   }
-
 
   if (error || !data?.success) {
     return (
@@ -48,7 +39,6 @@ export default function LeaderboardPage() {
   }
 
   const participants = data.data || [];
-
 
   const top3 = participants.slice(0, 3);
   const others = participants.slice(3);
@@ -67,7 +57,7 @@ export default function LeaderboardPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <h1 className="text-xl sm:text-3xl font-bold">Leaderboard – Top Performers 🏆</h1>
+              <h1 className="text-xl sm:text-3xl font-bold">Leaderboard 🏆</h1>
               <Button
                 onClick={() => {
                   alert({
@@ -76,85 +66,165 @@ export default function LeaderboardPage() {
                     actionText: "OK, Got it!",
                     description: (
                       <>
-
                         <p className="text-muted-foreground text-lg">
-                          It includes top performance stats, and the list is updated every hour.
+                          It includes top performance stats, and the list is
+                          updated every hour.
                           <br />
-                          The rankings are calculated based on your streak and the submission order (who submitted earlier).
-                          Being first or last on the leaderboard doesn’t mean much—it’s mainly for general reference.
+                          The rankings are calculated based on your streak and
+                          the submission order (who submitted earlier). Being
+                          first or last on the leaderboard doesn’t mean
+                          much—it’s mainly for general reference.
                           <br />
-                          The only thing that truly matters is keeping your 15-day streak.
+                          The only thing that truly matters is keeping your
+                          15-day streak.
                         </p>
                       </>
-                    )
-                  })
+                    ),
+                  });
                 }}
-                variant={"outline"} size={"icon"} className="ml-4 text-muted-foreground shadow-none">
+                variant={"outline"}
+                size={"icon"}
+                className="ml-4 text-muted-foreground shadow-none"
+              >
                 <Info />
               </Button>
             </div>
           </div>
 
-          {/* Podium Section */}
-          {podiumOrder.length > 0 && (
-            <div className="flex items-end justify-center gap-4 min-h-[300px] py-8">
-              {podiumOrder.map((participant, index) => {
-                if (!participant) return null;
+          {/* Top 3 Section */}
+          {top3.length > 0 && (
+            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-2">
+              <CardHeader>
+                <CardTitle className="text-center text-lg">
+                  Top 3 Participants
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Mobile: flex-col layout */}
+                <div className="flex flex-col gap-3 md:hidden">
+                  {top3.map((participant, index) => {
+                    if (!participant) return null;
 
-                // Determine styling based on ACTUAL rank (which matches array position logic)
-                // BUT we re-ordered the array.
-                // top3[1] is rank 2. top3[0] is rank 1. top3[2] is rank 3.
-
-                const isFirst = participant === top3[0];
-                const isSecond = participant === top3[1];
-                const isThird = participant === top3[2];
-
-                return (
-                  <div
-                    key={participant.userId}
-                    className={cn(
-                      "relative flex flex-col items-center p-4 rounded-t-lg transition-all md:w-48 w-1/3",
-                      isFirst ? "bg-primary/10 h-64 border-t-4 border-yellow-500" :
-                        isSecond ? "bg-muted/50 h-52 border-t-4 border-gray-400" :
-                          "bg-muted/30 h-44 border-t-4 border-amber-700"
-                    )}
-                  >
-                    {/* Medal / Badge */}
-                    <div className="absolute -top-6">
-                      {isFirst && <span className="text-4xl">🥇</span>}
-                      {isSecond && <span className="text-4xl">🥈</span>}
-                      {isThird && <span className="text-4xl">🥉</span>}
-                    </div>
-
-                    {/* Content */}
-                    <div className="mt-8 text-center flex flex-col items-center gap-2">
-                      <Avatar className={cn("border-2",
-                        isFirst ? "w-16 h-16 border-yellow-500" :
-                          isSecond ? "w-14 h-14 border-gray-400" :
-                            "w-12 h-12 border-amber-700"
-                      )}>
-                        <AvatarImage src={participant.image || undefined} />
-                        <AvatarFallback>
-                          {participant.name?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      <div className="font-bold truncate max-w-full px-2" title={participant.name || ""}>
-                        {participant.name?.split(" ")[0]}
+                    return (
+                      <div
+                        key={participant.userId}
+                        className={cn(
+                          "flex items-center gap-4 p-4 rounded-lg border-2",
+                          index === 0
+                            ? "bg-yellow-500/10 border-yellow-500"
+                            : index === 1
+                              ? "bg-gray-400/10 border-gray-400"
+                              : "bg-amber-700/10 border-amber-700",
+                        )}
+                      >
+                        <div className="text-3xl">
+                          {index === 0 && "🥇"}
+                          {index === 1 && "🥈"}
+                          {index === 2 && "🥉"}
+                        </div>
+                        <Avatar
+                          className={cn(
+                            "border-2",
+                            index === 0
+                              ? "w-14 h-14 border-yellow-500"
+                              : index === 1
+                                ? "w-12 h-12 border-gray-400"
+                                : "w-12 h-12 border-amber-700",
+                          )}
+                        >
+                          <AvatarImage src={participant.image || undefined} />
+                          <AvatarFallback>
+                            {participant.name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="font-bold text-base">
+                            {participant.name}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge
+                              variant={index === 0 ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              🔥 {participant.currentStreak}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {participant.totalSubmissions} days
+                            </span>
+                          </div>
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
 
-                      <Badge variant={isFirst ? "default" : "secondary"}>
-                        🔥 {participant.currentStreak}
-                      </Badge>
+                {/* Desktop: podium layout */}
+                <div className="hidden md:flex items-end justify-center gap-4 min-h-[300px] py-8">
+                  {podiumOrder.map((participant, _index) => {
+                    if (!participant) return null;
 
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {participant.totalSubmissions} days
+                    const isFirst = participant === top3[0];
+                    const isSecond = participant === top3[1];
+                    const isThird = participant === top3[2];
+
+                    return (
+                      <div
+                        key={participant.userId}
+                        className={cn(
+                          "relative flex flex-col items-center p-4 rounded-t-lg transition-all w-48",
+                          isFirst
+                            ? "bg-primary/10 h-64 border-t-4 border-yellow-500"
+                            : isSecond
+                              ? "bg-muted/50 h-52 border-t-4 border-gray-400"
+                              : "bg-muted/30 h-44 border-t-4 border-amber-700",
+                        )}
+                      >
+                        {/* Medal / Badge */}
+                        <div className="absolute -top-6">
+                          {isFirst && <span className="text-4xl">🥇</span>}
+                          {isSecond && <span className="text-4xl">🥈</span>}
+                          {isThird && <span className="text-4xl">🥉</span>}
+                        </div>
+
+                        {/* Content */}
+                        <div className="mt-8 text-center flex flex-col items-center gap-2">
+                          <Avatar
+                            className={cn(
+                              "border-2",
+                              isFirst
+                                ? "w-16 h-16 border-yellow-500"
+                                : isSecond
+                                  ? "w-14 h-14 border-gray-400"
+                                  : "w-12 h-12 border-amber-700",
+                            )}
+                          >
+                            <AvatarImage src={participant.image || undefined} />
+                            <AvatarFallback>
+                              {participant.name?.[0]}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          <div
+                            className="font-bold truncate max-w-full px-2"
+                            title={participant.name || ""}
+                          >
+                            {participant.name?.split(" ")[0]}
+                          </div>
+
+                          <Badge variant={isFirst ? "default" : "secondary"}>
+                            🔥 {participant.currentStreak}
+                          </Badge>
+
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {participant.totalSubmissions} days
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* List for the rest */}
@@ -171,7 +241,9 @@ export default function LeaderboardPage() {
                       <TableHead>Participant</TableHead>
                       <TableHead>Domain</TableHead>
                       <TableHead className="text-center">Streak</TableHead>
-                      <TableHead className="text-center">Total Submissions</TableHead>
+                      <TableHead className="text-center">
+                        Total Submissions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -184,9 +256,14 @@ export default function LeaderboardPage() {
                           #{participant.rank}
                         </TableCell>
                         <TableCell>
-                          <Link href={`/u/${participant.userId}`} className="flex items-center gap-3">
+                          <Link
+                            href={`/u/${participant.userId}`}
+                            className="flex items-center gap-3"
+                          >
                             <Avatar>
-                              <AvatarImage src={participant.image || undefined} />
+                              <AvatarImage
+                                src={participant.image || undefined}
+                              />
                               <AvatarFallback>
                                 {participant.name?.[0]}
                               </AvatarFallback>
@@ -200,11 +277,18 @@ export default function LeaderboardPage() {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">
-                            {DOMAINS.find((d) => d.id === participant.domain)?.title || "N/A"}
+                            {DOMAINS.find((d) => d.id === participant.domain)
+                              ?.title || "N/A"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <span className={cn("font-mono font-bold", getCurrentDayNumber() > participant.currentStreak, "text-destructive")}>
+                          <span
+                            className={cn(
+                              "font-mono font-bold",
+                              getCurrentDayNumber() >
+                                participant.currentStreak && "text-destructive",
+                            )}
+                          >
                             {participant.currentStreak}
                           </span>
                         </TableCell>
