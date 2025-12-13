@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { APP_CONFIG, TARANGA_CONFIG } from "@/content/config";
+import { APP_CONFIG} from "@/content/config";
 import { CHALLANGE_DATA } from "@/content/data";
 import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
@@ -43,9 +43,6 @@ const formSchema = z.object({
   verifyMyDetails: z.boolean().refine((val) => val === true, {
     message: `You must mention ${APP_CONFIG.name} in your post.`,
   }),
-  verifyTaranga: z.boolean().refine((val) => val === true, {
-    message: `You must mention ${TARANGA_CONFIG.name} in your post.`,
-  }),
   verifyGuidelines: z.boolean().refine((val) => val === true, {
     message: "You must acknowledge the guidelines.",
   }),
@@ -71,7 +68,6 @@ export const SubmitForm = () => {
       verifyMyDetails: false,
       verifyGuidelines: false,
       verifySponsor: false,
-      verifyTaranga: false,
     },
   });
 
@@ -300,7 +296,7 @@ export const SubmitForm = () => {
                     )}
                   />
 
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="verifyTaranga"
                     render={({ field }) => (
@@ -327,7 +323,7 @@ export const SubmitForm = () => {
                         </div>
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}
