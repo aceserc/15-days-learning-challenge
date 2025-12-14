@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "@/providers";
 import NextTopLoader from "nextjs-toploader";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
             showAtBottom={false}
           />
           <Toaster />
+          <GoogleAnalytics gaId="G-87XSNSWCVM" />
         </SessionProvider>
       </body>
     </html>
