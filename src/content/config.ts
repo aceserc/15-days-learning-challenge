@@ -8,3 +8,8 @@ export const APP_CONFIG = {
     linkedinUrl: "https://www.linkedin.com/company/taranga-ioe-purwanchal-campus"
   }
 };
+export const TARANGA_CONFIG = {
+  name: "Taranga",
+  href: "https://taranga.ioepc.edu.np",
+  linkedinUrl: "https://www.linkedin.com/company/taranga-ioe-purwanchal-campus"
+};
