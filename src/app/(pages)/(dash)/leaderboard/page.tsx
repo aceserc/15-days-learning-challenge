@@ -65,7 +65,7 @@ export default function LeaderboardPage() {
       <div className="container mx-auto p-4 md:p-8 max-w-5xl">
         <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          {participants.length > 0 && < div className="flex items-center justify-between">
             <div className="flex items-center">
               <h1 className="text-xl sm:text-3xl font-bold">Leaderboard – Top Performers 🏆</h1>
               <Button
@@ -93,7 +93,7 @@ export default function LeaderboardPage() {
                 <Info />
               </Button>
             </div>
-          </div>
+          </div>}
 
           {/* Podium Section */}
           {podiumOrder.length > 0 && (
@@ -224,6 +224,6 @@ export default function LeaderboardPage() {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }

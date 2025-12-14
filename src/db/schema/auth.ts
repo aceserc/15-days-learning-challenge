@@ -16,6 +16,12 @@ export const users = pgTable("user", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  schoolName: text("schoolName"),
+  phoneNumber: text("phoneNumber"),
+  phoneNumberVerifiedAt: timestamp("phoneNumberVerifiedAt", { mode: "date" }),
+  createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
+  isOnboarded: boolean("isOnboarded").notNull().default(false),
 });
 
 export const accounts = pgTable(
