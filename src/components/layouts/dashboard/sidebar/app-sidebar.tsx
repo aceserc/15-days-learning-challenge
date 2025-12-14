@@ -71,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{APP_CONFIG.name}</span>
+            <span className="truncate font-medium">Taranga, ACES x EXCESS</span>
             <span className="truncate text-xs">
               {CHALLANGE_DATA.durationInDays} Days Learning Challenge
             </span>
