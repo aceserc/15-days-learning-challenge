@@ -43,6 +43,9 @@ const formSchema = z.object({
   verifyMyDetails: z.boolean().refine((val) => val === true, {
     message: `You must mention ${APP_CONFIG.name} in your post.`,
   }),
+  verifyTaranga: z.boolean().refine((val) => val === true, {
+    message: `You must mention ${TARANGA_CONFIG.name} in your post.`,
+  }),
   verifyGuidelines: z.boolean().refine((val) => val === true, {
     message: "You must acknowledge the guidelines.",
   }),
