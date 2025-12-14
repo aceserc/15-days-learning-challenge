@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { APP_CONFIG, TARANGA_CONFIG } from "@/content/config";
+import { APP_CONFIG,  } from "@/content/config";
 import { CHALLANGE_DATA } from "@/content/data";
 import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
