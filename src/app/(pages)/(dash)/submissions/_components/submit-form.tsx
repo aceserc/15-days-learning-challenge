@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { APP_CONFIG,  } from "@/content/config";
+import { APP_CONFIG, TARANGA_CONFIG } from "@/content/config";
 import { CHALLANGE_DATA } from "@/content/data";
 import { SPONSOR } from "@/content/sponsor";
 import { getCurrentDayNumber } from "@/lib/event";
@@ -33,9 +33,12 @@ import { z } from "zod";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
-  link: z.string().url("Please enter a valid URL.").includes("linkedin.com/posts", {
-    error: "Please enter a valid linkedin post URL"
-  }),
+  link: z
+    .string()
+    .url("Please enter a valid URL.")
+    .includes("linkedin.com/posts", {
+      error: "Please enter a valid linkedin post URL",
+    }),
   summary: z.string().min(10, "Summary must be at least 10 characters."),
   verifyHashtags: z.boolean().refine((val) => val === true, {
     message: "You must use the required hashtags.",
@@ -52,10 +55,6 @@ const formSchema = z.object({
   verifySponsor: z.boolean().refine((val) => val === true, {
     message: "You must mention the sponsor.",
   }),
-  verifyTaranga: z.boolean().refine((val) => val === true, {
-    message: `You must mention ${APP_CONFIG.taranga.name} in your post.`,
-  }),
-
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -75,7 +74,7 @@ export const SubmitForm = () => {
       verifyMyDetails: false,
       verifyGuidelines: false,
       verifySponsor: false,
-      verifyTaranga: false
+      verifyTaranga: false,
     },
   });
 
@@ -154,9 +153,9 @@ export const SubmitForm = () => {
                                 className={cn(
                                   "relative flex cursor-pointer aspect-square flex-col items-center justify-center rounded-xl border-2 border-muted bg-card py-4 text-center transition-all hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary shadow-sm",
                                   isDisabled &&
-                                  "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
+                                    "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
                                   isSubmitted &&
-                                  "border-primary/20 bg-primary/5 text-primary opacity-60"
+                                    "border-primary/20 bg-primary/5 text-primary opacity-60"
                                 )}
                               >
                                 <span className="text-xl font-bold">{day}</span>
@@ -181,11 +180,16 @@ export const SubmitForm = () => {
 
                     <Card className="p-2! text-muted-foreground text-sm">
                       <p>
-
-                        If you’re confused about what to write, what things to include, or which tags to use, you can see a sample post <Link className="text-primary underline inline" href={"/sample.jpeg"} target="_blank">
+                        If you’re confused about what to write, what things to
+                        include, or which tags to use, you can see a sample post{" "}
+                        <Link
+                          className="text-primary underline inline"
+                          href={"/sample.jpeg"}
+                          target="_blank"
+                        >
                           here
-
-                        </Link>.
+                        </Link>
+                        .
                       </p>
                     </Card>
 
@@ -304,34 +308,36 @@ export const SubmitForm = () => {
                     )}
                   />
 
-                  { <FormField
-                    control={form.control}
-                    name="verifyTaranga"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="font-normal cursor-pointer">
-                            I have mentioned{" "}
-                            <a
-                              href={TARANGA_CONFIG.href}
-                              target="_blank"
-                              className="font-medium text-primary hover:underline underline-offset-4"
-                              rel="noreferrer"
-                            >
-                              {TARANGA_CONFIG.name}
-                            </a>{" "}
-                            in my post.
-                          </FormLabel>
-                        </div>
-                      </FormItem>
-                    )}
-                  /> }
+                  {
+                    <FormField
+                      control={form.control}
+                      name="verifyTaranga"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="font-normal cursor-pointer">
+                              I have mentioned{" "}
+                              <a
+                                href={TARANGA_CONFIG.href}
+                                target="_blank"
+                                className="font-medium text-primary hover:underline underline-offset-4"
+                                rel="noreferrer"
+                              >
+                                {TARANGA_CONFIG.name}
+                              </a>{" "}
+                              in my post.
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  }
 
                   <FormField
                     control={form.control}
