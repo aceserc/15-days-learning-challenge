@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -5,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { CHALLANGE_DATA } from "@/content/data";
+import Link from "next/link";
 
 const INFO = [
   {
@@ -61,6 +62,30 @@ export const Info = () => {
             <p className="text-sm font-medium text-destructive">
               ⚠️ Important: You can only submit once per day. Missing a day will
               automatically disqualify you from the challenge.
+            </p>
+          </div>
+          <div className="pt-4 border-t text-center">
+            <p className="text-xs text-muted-foreground">
+              Designed & Developed by{" "}
+              <Link
+                href="https://github.com/dev-sandip"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold hover:underline"
+              >
+                @dev-sandip
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="https://github.com/jrtilak"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold hover:underline"
+              >
+                @jrtilak
+              </Link>
+              {" "}
+              and ACES Tech Team with love.
             </p>
           </div>
         </CardContent>
