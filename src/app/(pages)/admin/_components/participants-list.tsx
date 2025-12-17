@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { DOMAINS } from "@/content/domains"
 import { useGetAllParticipants } from "@/queries/admin/hooks"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -47,7 +48,7 @@ export default function ParticipantsList() {
                   <span className="text-xs text-muted-foreground">{participant.user?.email}</span>
                 </div>
               </TableCell>
-              <TableCell>{participant.domain}</TableCell>
+              <TableCell>{DOMAINS.find((d) => d.id === participant.domain)?.title}</TableCell>
               <TableCell>{format(new Date(participant.createdAt), "PPP")}</TableCell>
               <TableCell className="text-right">
                 <Link href={`/admin/participants/${participant.id}`}>

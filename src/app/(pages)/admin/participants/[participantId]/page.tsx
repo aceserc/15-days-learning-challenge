@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { DOMAINS } from "@/content/domains"
 import { useGetParticipantById, useGetUserById } from "@/queries/admin/hooks"
 import { format } from "date-fns"
 import { ArrowLeft } from "lucide-react"
@@ -62,7 +63,7 @@ export default function ParticipantProfilePage() {
               </div>
               <div className="space-y-1">
                 <span className="text-sm font-medium text-muted-foreground">Domain</span>
-                <p className="text-sm">{participant.domain}</p>
+                <p className="text-sm">{DOMAINS.find((d) => d.id === participant.domain)?.title || "Participant"}</p>
               </div>
               <div className="space-y-1">
                 <span className="text-sm font-medium text-muted-foreground">Registered At</span>
