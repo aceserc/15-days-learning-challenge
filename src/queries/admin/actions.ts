@@ -117,7 +117,7 @@ export const fetchAdminChartData = tryCatchAction(async (): Promise<ActionRespon
   const submissionsMap = new Map<number, number>();
   // Initialize for all expected days if we want, but dynamic is fine too.
   // Assuming 15 days challenge
-  for (let i = 1; i <= parseInt(CHALLANGE_DATA.durationInDays || "15"); i++) {
+  for (let i = 1; i <= CHALLANGE_DATA.durationInDays; i++) {
     submissionsMap.set(i, 0);
   }
 
