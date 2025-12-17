@@ -4,21 +4,17 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { auth } from "@/lib/auth";
-import { AppSidebar } from "./sidebar/app-sidebar";
+import { AdminSidebar } from "./sidebar/admin-sidebar";
 import { Breadcrumb } from "./sidebar/breadcrumb";
 
-export default async function DashboardLayout({
+export default function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await auth();
-  const isAdmin = user?.user?.email && process.env.ADMIN_EMAILS?.includes(user?.user?.email);
-
   return (
     <SidebarProvider>
-      <AppSidebar isAdmin={!!isAdmin} />
+      <AdminSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
           <div className="flex items-center gap-2 px-4">

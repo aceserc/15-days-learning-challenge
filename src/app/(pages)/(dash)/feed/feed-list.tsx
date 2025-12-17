@@ -17,7 +17,6 @@ export const FeedList = () => {
     error,
     isLoading,
   } = api.submissions.useGetFeedSubmissions();
-  console.log(data)
   if (isLoading) {
     return (
       <div className="space-y-6">

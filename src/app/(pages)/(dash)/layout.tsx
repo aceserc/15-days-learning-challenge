@@ -14,7 +14,6 @@ const AuthenticatedLayout = async ({
   }
 
   const user = await auth();
-  console.log(user)
   if (!user?.user?.isOnboarded) {
     return redirect("/onboarding");
   }
