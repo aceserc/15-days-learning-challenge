@@ -11,14 +11,14 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DOMAINS } from "@/content/domains"
-import { useGetAllParticipants } from "@/queries/admin/hooks"
+import { api } from "@/queries"
 import { format } from "date-fns"
 import { Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
 export default function ParticipantsList() {
-  const { data: participants, isLoading } = useGetAllParticipants()
+  const { data: participants, isLoading } = api.admin.useGetAllParticipants()
   const [search, setSearch] = useState("")
 
   const filteredParticipants = participants?.data?.filter((participant) => {
@@ -72,13 +72,8 @@ export default function ParticipantsList() {
                 <TableCell>{format(new Date(participant.createdAt), "PPP")}</TableCell>
                 <TableCell className="text-right">
                   <Link href={`/admin/participants/${participant.id}`}>
-                    <Button variant="outline" size="sm" className="mr-2">
-                      Participant Profile
-                    </Button>
-                  </Link>
-                  <Link href={`/admin/users/${participant.userId}`}>
                     <Button variant="ghost" size="sm">
-                      User Profile
+                      View
                     </Button>
                   </Link>
                 </TableCell>

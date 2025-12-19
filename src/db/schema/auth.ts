@@ -22,6 +22,7 @@ export const users = pgTable("user", {
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
   isOnboarded: boolean("isOnboarded").notNull().default(false),
+  isAdmin: boolean("isAdmin").notNull().default(false),
 });
 
 export const accounts = pgTable(

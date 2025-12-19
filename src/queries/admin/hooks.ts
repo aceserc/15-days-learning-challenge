@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { serverAction } from "../lib"
-import { fetchAdminChartData, fetchAdminStats, fetchPartcipants, fetchParticipantById, fetchTotalUsers, fetchUserById } from "./actions"
+import { fetchAdminChartData, fetchAdminStats, fetchPartcipants, fetchParticipantById, fetchSubmissionsByUserId, fetchTotalUsers, fetchUserById } from "./actions"
 
 export const useGetAllParticipants = () => {
   return useQuery({
@@ -43,5 +43,12 @@ export const useGetUserById = (id: string) => {
     queryKey: ["user", id],
     queryFn: () => serverAction(fetchUserById)(id),
     enabled: !!id
+  })
+}
+export const useGetSubmissionsByUserId = (userId: string) => {
+  return useQuery({
+    queryKey: ["submissions", userId],
+    queryFn: () => serverAction(fetchSubmissionsByUserId)(userId),
+    enabled: !!userId
   })
 }

@@ -34,6 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.createdAt = user.createdAt;
         session.user.updatedAt = user.updatedAt;
         session.user.isOnboarded = user.isOnboarded;
+        session.user.isAdmin = user.isAdmin
       }
       return session;
     },

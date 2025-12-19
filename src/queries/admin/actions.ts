@@ -2,7 +2,7 @@
 
 import { CHALLANGE_DATA } from "@/content/data"
 import { db } from "@/db"
-import { participants, submissions, users } from "@/db/schema"
+import { participants, submissions, users, type Submission } from "@/db/schema"
 import { count, eq } from "drizzle-orm"
 import { tryCatchAction } from "../lib"
 import { ActionResponse } from "../types"
@@ -149,5 +149,14 @@ export const fetchAdminChartData = tryCatchAction(async (): Promise<ActionRespon
       submissionsByDay,
       participantsByDate
     }
+  }
+})
+
+export const fetchSubmissionsByUserId = tryCatchAction(async (userId: string): Promise<ActionResponse<Submission[]>> => {
+  const data = await db.select().from(submissions).where(eq(submissions.userId, userId)).orderBy(submissions.day)
+  return {
+    success: true,
+    message: `Submissions fetched successfully`,
+    data: data
   }
 })

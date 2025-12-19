@@ -57,6 +57,13 @@
       "when": 1765679050842,
       "tag": "0007_faulty_black_crow",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1765970379945,
+      "tag": "0008_groovy_cerebro",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ declare module "next-auth" {
         createdAt: string | null,
         updatedAt: string | null,
         isOnboarded: boolean | null,
+        isAdmin: boolean | null
     }
 
     interface Session {

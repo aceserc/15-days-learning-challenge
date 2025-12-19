@@ -12,18 +12,7 @@ export default function AdminDashboardPage() {
       </div>
       <AdminStats />
       <AdminCharts />
-      <Tabs defaultValue="participants" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="participants">Participants</TabsTrigger>
-          <TabsTrigger value="users">All Users</TabsTrigger>
-        </TabsList>
-        <TabsContent value="participants" className="space-y-4">
-          <ParticipantsList />
-        </TabsContent>
-        <TabsContent value="users" className="space-y-4">
-          <UsersList />
-        </TabsContent>
-      </Tabs>
+      <ParticipantsList />
     </div>
   )
 }

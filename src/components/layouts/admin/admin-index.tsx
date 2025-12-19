@@ -4,8 +4,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AdminSidebar } from "./sidebar/admin-sidebar";
-import { Breadcrumb } from "./sidebar/breadcrumb";
+import { AdminSidebar } from "../dashboard/sidebar/admin-sidebar";
+import { Breadcrumb } from "../dashboard/sidebar/breadcrumb";
 
 export default function AdminDashboardLayout({
   children,
