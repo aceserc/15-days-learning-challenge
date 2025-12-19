@@ -46,8 +46,9 @@ const GETTING_STARTED_LINKS: Navlink[] = [
 const OTHER_LINKS: Navlink[] = [
   {
     name: "Feedback",
-    url: "/feedback",
+    url: process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL as string,
     icon: Send,
+    target: "_blank"
   },
   {
     name: "Support",
