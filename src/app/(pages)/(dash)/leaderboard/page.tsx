@@ -106,8 +106,9 @@ export default function LeaderboardPage() {
                     if (!participant) return null;
 
                     return (
-                      <div
+                      <Link
                         key={participant.userId}
+                        href={`/u/${participant.userId}`}
                         className={cn(
                           "flex items-center gap-4 p-4 rounded-lg border-2",
                           index === 0
@@ -153,7 +154,7 @@ export default function LeaderboardPage() {
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>
@@ -168,10 +169,11 @@ export default function LeaderboardPage() {
                     const isThird = participant === top3[2];
 
                     return (
-                      <div
+                      <Link
                         key={participant.userId}
+                        href={`/u/${participant.userId}`}
                         className={cn(
-                          "relative flex flex-col items-center p-4 rounded-t-lg transition-all w-48",
+                          "relative flex flex-col items-center p-4 rounded-t-lg transition-all w-48 hover:scale-105",
                           isFirst
                             ? "bg-primary/10 h-64 border-t-4 border-yellow-500"
                             : isSecond
@@ -219,7 +221,7 @@ export default function LeaderboardPage() {
                             {participant.totalSubmissions} days
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>
@@ -286,7 +288,7 @@ export default function LeaderboardPage() {
                             className={cn(
                               "font-mono font-bold",
                               getCurrentDayNumber() >
-                                participant.currentStreak && "text-destructive",
+                              participant.currentStreak && "text-destructive",
                             )}
                           >
                             {participant.currentStreak}
