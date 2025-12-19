@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { api } from "@/queries";
+import { signOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
+import { confirm } from "@/components/ui/alert-utils";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -53,6 +56,18 @@ export function OnboardingForm({ user }: OnboardingFormProps) {
             toast.error("Something went wrong")
         }
     }
+
+    const onLogout = async () => {
+        const shouldLogout = await confirm({
+            title: "Logout!",
+            description: "Are you sure you want to logout and switch accounts?",
+            variant: "destructive",
+            actionText: "Logout & Switch",
+        });
+        if (shouldLogout) {
+            await signOut();
+        }
+    };
 
 
 
@@ -122,9 +137,21 @@ export function OnboardingForm({ user }: OnboardingFormProps) {
                     />
 
 
-                    <Button type="submit" className="w-full" isLoading={updateProfile.isPending}>
-                        Verify & Finish
-                    </Button>
+                    <div className="space-y-3">
+                        <Button type="submit" className="w-full font-bold h-11" isLoading={updateProfile.isPending}>
+                            Verify & Finish
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={onLogout}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-2 font-medium w-full"
+                        >
+                            <LogOut className="h-3.5 w-3.5" />
+                            Not you? Switch account
+                        </Button>
+                    </div>
                 </form>
             </Form>
         </div>
