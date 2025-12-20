@@ -43,3 +43,5 @@ export const DOMAINS = [
     }
   },
 ];
+
+export type DomainName = typeof DOMAINS[number]["id"]

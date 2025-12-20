@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { MagicCard } from "@/components/ui/magic-card";
-import { DOMAINS } from "@/content/domains";
+import { DomainName, DOMAINS } from "@/content/domains";
 import { Participant } from "@/db/schema";
 import { Gift, ExternalLink, Sparkles, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ interface RewardCardProps {
 }
 
 export const RewardCard = ({ participation }: RewardCardProps) => {
-  const domainData = DOMAINS.find((d) => d.id === participation.domain);
+  const domainData = DOMAINS.find((d) => d.id === participation.domain as DomainName);
   const resource = domainData?.resources;
 
   if (!resource || resource.status === "unavailable") return null;
