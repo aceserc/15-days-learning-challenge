@@ -25,6 +25,7 @@ import { useMemo } from "react";
 import { ParticipateToChallenge } from "./_components/participate-to-challenge";
 import { RewardCard } from "./_components/reward-card";
 import { EnrollRewardCard } from "./_components/enroll-reward-card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
@@ -42,7 +43,7 @@ function calculateCurrentStreak(days: number[]): number {
 
 export default function DashboardPage() {
   const { data: submissionsData } = api.submissions.useGetMySubmissions();
-  const { data: participation } = api.participate.useGetMyParticipation();
+  const { data: participation, isLoading } = api.participate.useGetMyParticipation();
   const submissions = submissionsData?.data || [];
   const isParticipant = !!participation?.data;
 
@@ -61,7 +62,9 @@ export default function DashboardPage() {
       {/* Header & Actions */}
       <div className="flex gap-4 flex-col-reverse @3xl:flex-row">
         <div className="flex-1 space-y-8">
-          {participation?.data ? (
+          {isLoading ? (
+            <Skeleton className="h-[200px]" />
+          ) : participation?.data ? (
             <RewardCard participation={participation.data} />
           ) : (
             <EnrollRewardCard />
