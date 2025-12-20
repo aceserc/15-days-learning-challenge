@@ -1,11 +1,12 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { MagicCard } from "@/components/ui/magic-card";
 import { DomainName, DOMAINS } from "@/content/domains";
 import { Participant } from "@/db/schema";
-import { Gift, ExternalLink, Sparkles, Wand2 } from "lucide-react";
+import { Gift, ExternalLink, Sparkles, Wand2, PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface RewardCardProps {
@@ -13,13 +14,23 @@ interface RewardCardProps {
 }
 
 export const RewardCard = ({ participation }: RewardCardProps) => {
+  const [hasClaimed, setHasClaimed] = useState(false);
   const domainData = DOMAINS.find((d) => d.id === participation.domain as DomainName);
   const resource = domainData?.resources;
+
+  useEffect(() => {
+    const claimed = localStorage.getItem(`reward_claimed_${participation.userId}_${participation.domain}`);
+    if (claimed) {
+      setHasClaimed(true);
+    }
+  }, [participation.userId, participation.domain]);
 
   if (!resource || resource.status === "unavailable") return null;
 
   const handleClick = () => {
     if (resource.status !== "available") return;
+    localStorage.setItem(`reward_claimed_${participation.userId}_${participation.domain}`, "true");
+    setHasClaimed(true);
     const url = `https://www.nativesplug.com/?source=aces&user-id=${participation.userId}`;
     window.open(url, "_blank");
   };
@@ -89,21 +100,37 @@ export const RewardCard = ({ participation }: RewardCardProps) => {
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-wrap justify-center md:justify-start items-center gap-2 text-sm text-muted-foreground/80 italic">
-                <Wand2 className="h-3.5 w-3.5 text-primary/60" />
-                <span>Powered by NativesPlug, our Exclusive Learning Partner</span>
+              <div className="pt-2 flex flex-wrap justify-center md:justify-start items-center gap-2 text-sm">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold">
+                  <Wand2 className="h-4 w-4" />
+                  <span className="uppercase tracking-wider text-[10px] md:text-xs">NativesPlug Exclusive Partner</span>
+                </div>
               </div>
             </div>
 
             <div className="shrink-0 pt-4 md:pt-0">
               <div className={cn(
-                "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold shadow-xl transition-all duration-300",
+                "inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold shadow-xl transition-all duration-300",
                 resource.status === "available"
                   ? "bg-primary text-white shadow-primary/30 md:group-hover:bg-primary/90 md:group-hover:scale-105 active:scale-95 cursor-pointer"
                   : "bg-muted text-muted-foreground cursor-not-allowed opacity-70"
               )}>
-                {resource.status === "available" ? "Claim Reward" : "Notify Me"}
-                <ExternalLink className="h-4 w-4" />
+                {resource.status === "available" ? (
+                  hasClaimed ? (
+                    <>
+                      <PlayCircle className="h-5 w-5" />
+                      Resume Learning
+                    </>
+                  ) : (
+                    <>
+                      <Gift className="h-5 w-5" />
+                      Claim Reward
+                    </>
+                  )
+                ) : (
+                  "Notify Me"
+                )}
+                <ExternalLink className="h-4 w-4 ml-1" />
               </div>
             </div>
           </div>
