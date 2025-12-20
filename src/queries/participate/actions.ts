@@ -5,7 +5,7 @@ import { Participant, participants } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { ActionResponse } from "../types";
 import { CHALLANGE_DATA } from "@/content/data";
-import { DOMAINS } from "@/content/domains";
+import { DomainName, DOMAINS } from "@/content/domains";
 import { tryCatchAction } from "../lib";
 import { getAuth } from "../middlewares/require-auth";
 
@@ -34,7 +34,7 @@ export const participateToChallenge = tryCatchAction(
 
     const allDomains = Object.values(DOMAINS).map((domain) => domain.id);
 
-    if (!allDomains.includes(domain)) {
+    if (!allDomains.includes(domain as DomainName)) {
       return {
         success: false,
         error: "Invalid domain.",
