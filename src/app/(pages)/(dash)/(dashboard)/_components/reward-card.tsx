@@ -16,7 +16,7 @@ export const RewardCard = ({ participation }: RewardCardProps) => {
   const domainData = DOMAINS.find((d) => d.id === participation.domain);
   const resource = domainData?.resources;
 
-  if (!resource) return null;
+  if (!resource || resource.status === "unavailable") return null;
 
   const handleClick = () => {
     if (resource.status !== "available") return;
@@ -77,7 +77,7 @@ export const RewardCard = ({ participation }: RewardCardProps) => {
                 <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
                   {resource.status === "available"
                     ? `Congratulations! As a ${domainData?.title} participant, you've been granted access to:`
-                    : `Get ready! As a ${domainData?.title} participant, you will be notified after this reward is available:`}
+                    : `Get ready! As a ${domainData?.title} participant, your course reward will be available soon:`}
                 </p>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <h4 className={cn(

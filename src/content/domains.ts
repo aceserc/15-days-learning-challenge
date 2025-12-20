@@ -29,7 +29,7 @@ export const DOMAINS = [
     icon: Code,
     resources: {
       title: "AI Dev Fast-Track: From Idea to App in 10 Days",
-      status: "coming-soon" as const,
+      status: "unavailable" as const,
     }
   },
   {
