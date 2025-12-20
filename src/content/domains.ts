@@ -2,27 +2,44 @@ import { Code, Globe, Smartphone, Terminal } from "lucide-react";
 
 export const DOMAINS = [
   {
-    id: "web-dev",
+    id: "web-dev" as const,
     title: "Web Development",
     description: "Build modern web applications.",
     icon: Globe,
+    resources: {
+      title: "Your First Web App: From Zero to Launch in 15 Days",
+      status: "available" as const,
+      link: "https://www.nativesplug.com"
+    }
   },
   {
-    id: "app-dev",
+    id: "app-dev" as const,
     title: "App Development",
     description: "Create native and cross-platform apps.",
     icon: Smartphone,
+    resources: {
+      title: "Your First Flutter App in Just 1 Week",
+      status: "coming-soon" as const,
+    }
   },
   {
-    id: "ml-ai",
+    id: "ml-ai" as const,
     title: "Machine Learning",
     description: "Explore AI and data science.",
     icon: Code,
+    resources: {
+      title: "AI Dev Fast-Track: From Idea to App in 10 Days",
+      status: "coming-soon" as const,
+    }
   },
   {
-    id: "cyber-security",
+    id: "cyber-security" as const,
     title: "Cyber Security",
     description: "Protect systems and networks.",
     icon: Terminal,
+    resources: {
+      title: "Become a Cyber Defender in 2 Weeks",
+      status: "coming-soon" as const,
+    }
   },
 ];

@@ -23,6 +23,8 @@ import { format } from "date-fns";
 import { Calendar, ExternalLink, Flame, Trophy } from "lucide-react";
 import { useMemo } from "react";
 import { ParticipateToChallenge } from "./_components/participate-to-challenge";
+import { RewardCard } from "./_components/reward-card";
+import { EnrollRewardCard } from "./_components/enroll-reward-card";
 
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
@@ -59,6 +61,11 @@ export default function DashboardPage() {
       {/* Header & Actions */}
       <div className="flex gap-4 flex-col-reverse @3xl:flex-row">
         <div className="flex-1 space-y-8">
+          {participation?.data ? (
+            <RewardCard participation={participation.data} />
+          ) : (
+            <EnrollRewardCard />
+          )}
           <ParticipateToChallenge />
 
           {/* Stats Grid */}
