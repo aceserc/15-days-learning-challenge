@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { serverAction } from "../lib";
-import { getMyParticipation, participateToChallenge } from "./actions";
+import { getMyParticipation, participateToChallenge, startChallenge } from "./actions";
 
 export const useGetMyParticipation = () => {
   return useQuery({
@@ -18,5 +18,22 @@ export const useParticipateToChallenge = () => {
         queryKey: ["getMyParticipation", "participants"],
       });
     },
+  });
+};
+
+export const useStartChallenge = (options?: {
+  onSuccess?: (data: any) => void;
+  onError?: (error: any) => void;
+}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: serverAction(startChallenge),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getMyParticipation"],
+      });
+      options?.onSuccess?.(res);
+    },
+    onError: options?.onError,
   });
 };

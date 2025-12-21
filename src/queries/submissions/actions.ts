@@ -36,15 +36,8 @@ export const submitDailyChallenge = tryCatchAction(
       return { success: false, error: "Challenge has not started yet." };
     }
 
-    // Check if within duration (same day any hour is handled by startOfDay comparison logic in UI, validation here)
-    const daysSinceStart = differenceInDays(today, startDate) + 1;
-
-    if (daysSinceStart > CHALLANGE_DATA.canSubmitTillDays) {
-      return { success: false, error: "Submission deadline is over." };
-    }
-
     // Check if user is a participant
-    const isParticipant = await db
+    const participantRes = await db
       .select()
       .from(participants)
       .where(
@@ -55,11 +48,29 @@ export const submitDailyChallenge = tryCatchAction(
       )
       .limit(1);
 
-    if (isParticipant.length === 0) {
+    if (participantRes.length === 0) {
       return {
         success: false,
         error: "You need to participate in the challenge first.",
       };
+    }
+
+    const participant = participantRes[0];
+
+    // Check if user has started their challenge
+    if (!participant.startedAt) {
+      return {
+        success: false,
+        error: "You need to start your challenge from the dashboard first.",
+      };
+    }
+
+    // Check if within duration relative to user's start
+    const userStartDate = startOfDay(participant.startedAt);
+    const daysSinceStart = differenceInDays(today, userStartDate) + 1;
+
+    if (daysSinceStart > CHALLANGE_DATA.canSubmitTillDays) {
+      return { success: false, error: "Submission deadline is over." };
     }
 
     // Check existing submission for this day
