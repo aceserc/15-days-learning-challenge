@@ -1,3 +1,5 @@
+"use client"
+
 import { FeedList } from "./feed-list";
 import { SponsorCard } from "@/components/sponsor-card";
 

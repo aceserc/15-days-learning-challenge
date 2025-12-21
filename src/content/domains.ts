@@ -17,8 +17,8 @@ export const DOMAINS = [
     description: "Create native and cross-platform apps.",
     icon: Smartphone,
     resources: {
-      title: "Your First Flutter App in Just 1 Week",
-      status: "unavailable" as const,
+      title: "Understanding Flutter - A Theory-First Guide",
+      status: "available" as const,
     }
   },
   {
