@@ -18,7 +18,7 @@ export const DOMAINS = [
     icon: Smartphone,
     resources: {
       title: "Your First Flutter App in Just 1 Week",
-      status: "coming-soon" as const,
+      status: "unavailable" as const,
     }
   },
   {
@@ -38,7 +38,7 @@ export const DOMAINS = [
     icon: Terminal,
     resources: {
       title: "Become a Cyber Defender in 2 Weeks",
-      status: "coming-soon" as const,
+      status: "available" as const,
     }
   },
 ];
