@@ -9,7 +9,6 @@ export const DOMAINS = [
     resources: {
       title: "Your First Web App: From Zero to Launch in 15 Days",
       status: "available" as const,
-      link: "https://www.nativesplug.com"
     }
   },
   {

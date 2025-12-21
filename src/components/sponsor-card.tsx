@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { SPONSOR } from "@/content/sponsor";
+import { api } from "@/queries";
 import { Heart } from "lucide-react";
 
 const SponsorCard = () => {
+  const user = api.participate.useGetMyParticipation()
   return (
     <Card className="gap-0! min-w-xs overflow-hidden border-2 border-primary/10 bg-gradient-to-br from-card to-card/50 hover:shadow-lg transition-all duration-300 hover:border-primary/20">
       <CardHeader className="pb-3">
@@ -14,7 +16,7 @@ const SponsorCard = () => {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <a
-            href={SPONSOR.href}
+            href={SPONSOR.href(user.data?.data?.userId)}
             target="_blank"
             rel="noreferrer"
             className="block group"
@@ -42,7 +44,7 @@ const SponsorCard = () => {
 
         <div className="pt-2">
           <a
-            href={SPONSOR.href}
+            href={SPONSOR.href(user.data?.data?.userId)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center justify-center text-xs font-medium text-primary hover:text-primary/80 transition-colors underline underline-offset-4"
