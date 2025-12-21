@@ -3,7 +3,7 @@
 import { CHALLANGE_DATA } from "@/content/data"
 import { db } from "@/db"
 import { participants, submissions, users, type Submission } from "@/db/schema"
-import { count, eq } from "drizzle-orm"
+import { count, desc, eq } from "drizzle-orm"
 import { tryCatchAction } from "../lib"
 import { ActionResponse } from "../types"
 interface Participants {
@@ -51,7 +51,7 @@ export const fetchPartcipants = tryCatchAction(async (): Promise<ActionResponse<
   }
 })
 export const fetchTotalUsers = tryCatchAction(async (): Promise<ActionResponse<User[]>> => {
-  const user = await db.select().from(users)
+  const user = await db.select().from(users).orderBy(desc(users.createdAt))
   return {
     success: true,
     message: `Total users fetched successfully`,
