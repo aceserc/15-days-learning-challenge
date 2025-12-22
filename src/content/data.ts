@@ -3,5 +3,6 @@ export const CHALLANGE_DATA = {
   techfestId: "v8.0",
   durationInDays: 15,
   canSubmitTillDays: 16,
+  registrationGracePeriodDays: 7,
   postHashtags: ["#aces", "#alc", "#techfest"],
 };

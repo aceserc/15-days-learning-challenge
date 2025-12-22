@@ -26,40 +26,59 @@ export type DailySubmission = {
 export const submitDailyChallenge = tryCatchAction(
   async (data: DailySubmission): Promise<ActionResponse> => {
     const user = await getAuth();
-
-    // Double check dates logic backend side
     const today = startOfDay(new Date());
-    const startDate = startOfDay(CHALLANGE_DATA.startDate);
-
-    // Check if challenge has started
-    if (today < startDate) {
-      return { success: false, error: "Challenge has not started yet." };
-    }
-
-    // Check if within duration (same day any hour is handled by startOfDay comparison logic in UI, validation here)
-    const daysSinceStart = differenceInDays(today, startDate) + 1;
-
-    if (daysSinceStart > CHALLANGE_DATA.canSubmitTillDays) {
-      return { success: false, error: "Submission deadline is over." };
-    }
 
     // Check if user is a participant
-    const isParticipant = await db
+    const participantRes = await db
       .select()
       .from(participants)
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
-    if (isParticipant.length === 0) {
+    if (participantRes.length === 0) {
       return {
         success: false,
         error: "You need to participate in the challenge first.",
       };
+    }
+
+    const participant = participantRes[0];
+
+    // Check if user has started their challenge
+    if (!participant.startedAt) {
+      return {
+        success: false,
+        error: "You need to start your challenge from the dashboard first.",
+      };
+    }
+
+    // Check if within duration relative to user's start
+    const userStartDate = startOfDay(participant.startedAt);
+    const daysSinceStart = differenceInDays(today, userStartDate) + 1;
+
+    // Validate that the day being submitted is not in the future
+    if (data.day > daysSinceStart) {
+      return {
+        success: false,
+        error: `You can only submit for days 1 to ${daysSinceStart}.`,
+      };
+    }
+
+    // Validate that the day is positive
+    if (data.day < 1) {
+      return {
+        success: false,
+        error: "Invalid day number.",
+      };
+    }
+
+    if (daysSinceStart > CHALLANGE_DATA.canSubmitTillDays) {
+      return { success: false, error: "Submission deadline is over." };
     }
 
     // Check existing submission for this day
@@ -70,8 +89,8 @@ export const submitDailyChallenge = tryCatchAction(
         and(
           eq(submissions.userId, user.id!),
           eq(submissions.day, data.day),
-          eq(submissions.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(submissions.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -94,7 +113,7 @@ export const submitDailyChallenge = tryCatchAction(
       success: true,
       message: "Thank you for submission",
     };
-  }
+  },
 );
 
 type SubmissionWithUser = Submission & {
@@ -127,8 +146,8 @@ export const getMySubmissions = tryCatchAction(
       .where(
         and(
           eq(submissions.userId, user.id!),
-          eq(submissions.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(submissions.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .orderBy(submissions.day);
 
@@ -143,8 +162,8 @@ export const getMySubmissions = tryCatchAction(
       .where(
         and(
           inArray(votes.submissionId, submissionIds),
-          eq(votes.userId, user.id!)
-        )
+          eq(votes.userId, user.id!),
+        ),
       );
 
     const enrichedData = data.map((sub) => {
@@ -160,13 +179,13 @@ export const getMySubmissions = tryCatchAction(
       data: enrichedData as SubmissionWithUser[],
       message: "Submissions fetched",
     };
-  }
+  },
 );
 
 export const getFeedSubmissions = tryCatchAction(
   async (
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<
     ActionResponse<{
       submissions: (SubmissionWithUser & { participant?: Participant })[];
@@ -201,10 +220,13 @@ export const getFeedSubmissions = tryCatchAction(
       })
       .from(submissions)
       .leftJoin(users, eq(submissions.userId, users.id))
-      .leftJoin(participants, and(
-        eq(submissions.userId, participants.userId),
-        eq(submissions.techfestId, participants.techfestId)
-      ))
+      .leftJoin(
+        participants,
+        and(
+          eq(submissions.userId, participants.userId),
+          eq(submissions.techfestId, participants.techfestId),
+        ),
+      )
       .where(eq(submissions.techfestId, CHALLANGE_DATA.techfestId))
       .orderBy(desc(submissions.createdAt))
       .limit(limit + 1)
@@ -229,8 +251,8 @@ export const getFeedSubmissions = tryCatchAction(
       .where(
         and(
           inArray(votes.submissionId, submissionIds),
-          eq(votes.userId, user.id!)
-        )
+          eq(votes.userId, user.id!),
+        ),
       );
 
     const enrichedData = slicedData.map((row) => {
@@ -246,17 +268,19 @@ export const getFeedSubmissions = tryCatchAction(
     return {
       success: true,
       data: {
-        submissions: enrichedData as (SubmissionWithUser & { participant?: Participant })[],
+        submissions: enrichedData as (SubmissionWithUser & {
+          participant?: Participant;
+        })[],
         hasMore,
       },
       message: "Feed fetched",
     };
-  }
+  },
 );
 export const voteSubmission = tryCatchAction(
   async (
     submissionId: string,
-    type: "up" | "down"
+    type: "up" | "down",
   ): Promise<ActionResponse> => {
     const user = await getAuth();
 
@@ -264,7 +288,7 @@ export const voteSubmission = tryCatchAction(
       .select()
       .from(votes)
       .where(
-        and(eq(votes.submissionId, submissionId), eq(votes.userId, user.id!))
+        and(eq(votes.submissionId, submissionId), eq(votes.userId, user.id!)),
       )
       .limit(1);
 
@@ -277,15 +301,16 @@ export const voteSubmission = tryCatchAction(
           .where(
             and(
               eq(votes.userId, user.id!),
-              eq(votes.submissionId, submissionId)
-            )
+              eq(votes.submissionId, submissionId),
+            ),
           );
 
         await db
           .update(submissions)
           .set({
-            voteCount: sql`${submissions.voteCount} - ${type === "up" ? 1 : -1
-              }`,
+            voteCount: sql`${submissions.voteCount} - ${
+              type === "up" ? 1 : -1
+            }`,
           })
           .where(eq(submissions.id, submissionId));
         return { success: true, message: "Vote removed" };
@@ -298,15 +323,16 @@ export const voteSubmission = tryCatchAction(
           .where(
             and(
               eq(votes.userId, user.id!),
-              eq(votes.submissionId, submissionId)
-            )
+              eq(votes.submissionId, submissionId),
+            ),
           );
 
         await db
           .update(submissions)
           .set({
-            voteCount: sql`${submissions.voteCount} + ${type === "up" ? 2 : -2
-              }`,
+            voteCount: sql`${submissions.voteCount} + ${
+              type === "up" ? 2 : -2
+            }`,
           })
           .where(eq(submissions.id, submissionId));
         return { success: true, message: "Vote updated" };
@@ -328,7 +354,7 @@ export const voteSubmission = tryCatchAction(
         .where(eq(submissions.id, submissionId));
       return { success: true, message: "Vote added" };
     }
-  }
+  },
 );
 
 export const deleteSubmission = tryCatchAction(
@@ -338,7 +364,7 @@ export const deleteSubmission = tryCatchAction(
     const deleted = await db
       .delete(submissions)
       .where(
-        and(eq(submissions.id, submissionId), eq(submissions.userId, user.id!))
+        and(eq(submissions.id, submissionId), eq(submissions.userId, user.id!)),
       )
       .returning();
 
@@ -347,5 +373,5 @@ export const deleteSubmission = tryCatchAction(
     }
 
     return { success: true, message: "Submission deleted successfully" };
-  }
+  },
 );

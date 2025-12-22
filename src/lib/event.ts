@@ -11,6 +11,14 @@ export function isEventStarted(): boolean {
   return isPast(CHALLANGE_DATA.startDate);
 }
 
+export function isRegistrationPeriodOver(): boolean {
+  const lastRegistrationDate = addDays(
+    CHALLANGE_DATA.startDate,
+    CHALLANGE_DATA.registrationGracePeriodDays
+  );
+  return isAfter(startOfDay(new Date()), startOfDay(lastRegistrationDate));
+}
+
 export function getDaysRemaining(): number {
   if (isEventStarted()) return 0;
   const now = new Date();
@@ -27,8 +35,9 @@ export function isDeadlineOver(): boolean {
   return isAfter(startOfDay(new Date()), getDeadlineDate());
 }
 
-export function getCurrentDayNumber(): number {
+export function getCurrentDayNumber(startedAt?: Date | null): number {
+  if (!startedAt) return 0;
   const today = startOfDay(new Date());
-  const startDate = startOfDay(CHALLANGE_DATA.startDate);
+  const startDate = startOfDay(startedAt);
   return differenceInCalendarDays(today, startDate) + 1;
 }

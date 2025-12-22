@@ -59,7 +59,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const SubmitForm = () => {
+export const SubmitForm = ({ startedAt }: { startedAt?: Date | null }) => {
   const [step, setStep] = useState<1 | 2>(1);
   const submit = api.submissions.useSubmitDailyChallenge();
   const { data: submissions } = api.submissions.useGetMySubmissions();
@@ -78,7 +78,10 @@ export const SubmitForm = () => {
     },
   });
 
-  const currentDayNumber = useMemo(() => getCurrentDayNumber(), []);
+  const currentDayNumber = useMemo(
+    () => getCurrentDayNumber(startedAt),
+    [startedAt]
+  );
 
   const submittedDays = useMemo(
     () => new Set(submissions?.data?.map((s) => s.day) || []),
@@ -153,9 +156,9 @@ export const SubmitForm = () => {
                                 className={cn(
                                   "relative flex cursor-pointer aspect-square flex-col items-center justify-center rounded-xl border-2 border-muted bg-card py-4 text-center transition-all hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary shadow-sm",
                                   isDisabled &&
-                                    "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
+                                  "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
                                   isSubmitted &&
-                                    "border-primary/20 bg-primary/5 text-primary opacity-60"
+                                  "border-primary/20 bg-primary/5 text-primary opacity-60"
                                 )}
                               >
                                 <span className="text-xl font-bold">{day}</span>
