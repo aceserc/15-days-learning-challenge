@@ -15,6 +15,7 @@ import { Participant, Submission } from "@/db/schema";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
 import { api } from "@/queries";
+import { ActionResponseError } from "@/queries/types";
 import { formatRelative } from "date-fns";
 import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
 import { User } from "next-auth";
@@ -75,36 +76,38 @@ export const PostCard = ({
         type,
       });
 
-      if (res.success) {
-        setVoteState((prev) => {
-          let newVote = prev.userVote;
-          let newCount = prev.count;
-
-          if (prev.userVote === type) {
-            // Toggle off (remove vote)
-            newVote = null;
-            if (type === "up") newCount -= 1;
-            else newCount += 1;
-          } else {
-            // Change vote or new vote
-            if (prev.userVote === "up" && type === "down") {
-              // Changed from up to down: -1 (remove up) + -1 (add down) = -2
-              newCount -= 2;
-            } else if (prev.userVote === "down" && type === "up") {
-              // Changed from down to up: +1 (remove down) + +1 (add up) = +2
-              newCount += 2;
-            } else {
-              // Null to vote
-              if (type === "up") newCount += 1;
-              else newCount -= 1;
-            }
-            newVote = type;
-          }
-          return { userVote: newVote, count: newCount };
-        });
-      } else {
-        toast.error(res.error || "Failed to vote");
+      if (!res.success) {
+        toast.error((res as unknown as ActionResponseError).error);
+        return;
       }
+
+      // Update optimistic UI state
+      setVoteState((prev) => {
+        let newVote = prev.userVote;
+        let newCount = prev.count;
+
+        if (prev.userVote === type) {
+          // Toggle off (remove vote)
+          newVote = null;
+          if (type === "up") newCount -= 1;
+          else newCount += 1;
+        } else {
+          // Change vote or new vote
+          if (prev.userVote === "up" && type === "down") {
+            // Changed from up to down: -1 (remove up) + -1 (add down) = -2
+            newCount -= 2;
+          } else if (prev.userVote === "down" && type === "up") {
+            // Changed from down to up: +1 (remove down) + +1 (add up) = +2
+            newCount += 2;
+          } else {
+            // Null to vote
+            if (type === "up") newCount += 1;
+            else newCount -= 1;
+          }
+          newVote = type;
+        }
+        return { userVote: newVote, count: newCount };
+      });
     } catch {
       toast.error("Something went wrong");
     } finally {
