@@ -27,7 +27,6 @@ export const DOMAINS = [
     description: "Explore AI and data science.",
     icon: Code,
     resources: {
-      title: "AI Dev Fast-Track: From Idea to App in 10 Days",
       status: "unavailable" as const,
     }
   },
