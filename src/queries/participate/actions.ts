@@ -29,8 +29,8 @@ export const participateToChallenge = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -61,7 +61,7 @@ export const participateToChallenge = tryCatchAction(
       message:
         "Thank your for participating in ACES 15-Day Learning Challenge!",
     };
-  }
+  },
 );
 
 export const getMyParticipation = tryCatchAction(
@@ -74,8 +74,8 @@ export const getMyParticipation = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -92,7 +92,7 @@ export const getMyParticipation = tryCatchAction(
       message: "You have not participated in this challenge.",
       data: null,
     };
-  }
+  },
 );
 
 export const startChallenge = tryCatchAction(
@@ -112,8 +112,8 @@ export const startChallenge = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -137,13 +137,13 @@ export const startChallenge = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       );
 
     return {
       success: true,
       message: "Challenge started! Good luck!",
     };
-  }
+  },
 );

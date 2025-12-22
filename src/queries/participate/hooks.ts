@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { serverAction } from "../lib";
-import { getMyParticipation, participateToChallenge, startChallenge } from "./actions";
+import {
+  getMyParticipation,
+  participateToChallenge,
+  startChallenge,
+} from "./actions";
 
 export const useGetMyParticipation = () => {
   return useQuery({

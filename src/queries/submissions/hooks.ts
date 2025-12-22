@@ -79,8 +79,13 @@ export const useGetFeedSubmissions = (limit: number = 20) => {
 export const useVoteSubmission = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ submissionId, type }: { submissionId: string; type: "up" | "down" }) =>
-      serverAction(voteSubmission)(submissionId, type),
+    mutationFn: ({
+      submissionId,
+      type,
+    }: {
+      submissionId: string;
+      type: "up" | "down";
+    }) => serverAction(voteSubmission)(submissionId, type),
     onSuccess: () => {
       // Invalidate all queries that might show votes
       queryClient.invalidateQueries({

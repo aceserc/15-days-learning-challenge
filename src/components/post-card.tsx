@@ -125,12 +125,21 @@ export const PostCard = ({
         </Link>
         <div className="flex flex-col flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <Link href={`/u/${user?.id}`} className="hover:underline font-medium">
+            <Link
+              href={`/u/${user?.id}`}
+              className="hover:underline font-medium"
+            >
               {user?.name || "Unknown User"}
             </Link>
             {submission.participant?.domain && (
-              <Badge variant="outline" className="text-sm h-5 px-1.5 font-normal text-muted-foreground">
-                {DOMAINS.find((d) => d.id === submission.participant?.domain)?.title}
+              <Badge
+                variant="outline"
+                className="text-sm h-5 px-1.5 font-normal text-muted-foreground"
+              >
+                {
+                  DOMAINS.find((d) => d.id === submission.participant?.domain)
+                    ?.title
+                }
               </Badge>
             )}
           </div>
@@ -165,7 +174,7 @@ export const PostCard = ({
             onClick={() => handleVote("up")}
             className={cn(
               "text-muted-foreground gap-2 transition-colors hover:text-green-500 hover:bg-green-500/10",
-              voteState.userVote === "up" && "text-green-500 bg-green-500/10"
+              voteState.userVote === "up" && "text-green-500 bg-green-500/10",
             )}
           >
             <ArrowBigUp
@@ -181,7 +190,7 @@ export const PostCard = ({
             onClick={() => handleVote("down")}
             className={cn(
               "text-muted-foreground gap-2 transition-colors hover:text-red-500 hover:bg-red-500/10",
-              voteState.userVote === "down" && "text-red-500 bg-red-500/10"
+              voteState.userVote === "down" && "text-red-500 bg-red-500/10",
             )}
           >
             <ArrowBigDown
@@ -198,4 +207,3 @@ export const PostCard = ({
     </Card>
   );
 };
-
