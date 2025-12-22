@@ -311,37 +311,6 @@ export const SubmitForm = ({ startedAt }: { startedAt?: Date | null }) => {
                     )}
                   />
 
-                  {
-                    <FormField
-                      control={form.control}
-                      name="verifyTaranga"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background/50">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="font-normal cursor-pointer">
-                              I have mentioned{" "}
-                              <a
-                                href={TARANGA_CONFIG.href}
-                                target="_blank"
-                                className="font-medium text-primary hover:underline underline-offset-4"
-                                rel="noreferrer"
-                              >
-                                {TARANGA_CONFIG.name}
-                              </a>{" "}
-                              in my post.
-                            </FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  }
-
                   <FormField
                     control={form.control}
                     name="verifyTaranga"
