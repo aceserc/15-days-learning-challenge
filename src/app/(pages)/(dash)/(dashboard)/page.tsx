@@ -26,6 +26,9 @@ import { ParticipateToChallenge } from "./_components/participate-to-challenge";
 import { RewardCard } from "./_components/reward-card";
 import { EnrollRewardCard } from "./_components/enroll-reward-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StartChallengeCard } from "./_components/start-challenge-card";
+import { SubmitProgressCard } from "./_components/submit-progress-card";
+import { isEventStarted } from "@/lib/event";
 
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
@@ -65,14 +68,21 @@ export default function DashboardPage() {
           {isLoading ? (
             <Skeleton className="h-[200px]" />
           ) : participation?.data ? (
-            <RewardCard participation={participation.data} />
+            <div className="space-y-8">
+              <RewardCard participation={participation.data} />
+              {participation.data.startedAt ? (
+                <SubmitProgressCard />
+              ) : (
+                isEventStarted() && <StartChallengeCard />
+              )}
+            </div>
           ) : (
             <EnrollRewardCard />
           )}
-          <ParticipateToChallenge />
+          {!participation?.data && <ParticipateToChallenge />}
 
           {/* Stats Grid */}
-          {isParticipant && (
+          {isParticipant && participation.data?.startedAt && (
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="pb-2">

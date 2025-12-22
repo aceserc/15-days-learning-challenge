@@ -10,6 +10,7 @@ export const participants = pgTable("participant", {
     .references(() => users.id, { onDelete: "cascade" }),
   domain: text("domain").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  startedAt: timestamp("startedAt"),
   techfestId: text("techfestId").notNull(),
 });
 

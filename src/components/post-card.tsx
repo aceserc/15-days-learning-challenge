@@ -15,7 +15,7 @@ import { Participant, Submission } from "@/db/schema";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
 import { api } from "@/queries";
-import { voteSubmission } from "@/queries/submissions/actions";
+import { ActionResponseError } from "@/queries/types";
 import { formatRelative } from "date-fns";
 import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
 import { User } from "next-auth";
@@ -37,6 +37,7 @@ export const PostCard = ({
 }: PostCardProps) => {
   const { data: session } = useSession();
   const deleteSubmissionMutation = api.submissions.useDeleteSubmission();
+  const voteSubmissionMutation = api.submissions.useVoteSubmission();
 
   const [isVoting, setIsVoting] = useState(false);
   const [voteState, setVoteState] = useState({
@@ -70,38 +71,43 @@ export const PostCard = ({
     setIsVoting(true);
 
     try {
-      const res = await voteSubmission(submission.id, type);
+      const res = await voteSubmissionMutation.mutateAsync({
+        submissionId: submission.id,
+        type,
+      });
 
-      if (res.success) {
-        setVoteState((prev) => {
-          let newVote = prev.userVote;
-          let newCount = prev.count;
-
-          if (prev.userVote === type) {
-            // Toggle off (remove vote)
-            newVote = null;
-            if (type === "up") newCount -= 1;
-            else newCount += 1;
-          } else {
-            // Change vote or new vote
-            if (prev.userVote === "up" && type === "down") {
-              // Changed from up to down: -1 (remove up) + -1 (add down) = -2
-              newCount -= 2;
-            } else if (prev.userVote === "down" && type === "up") {
-              // Changed from down to up: +1 (remove down) + +1 (add up) = +2
-              newCount += 2;
-            } else {
-              // Null to vote
-              if (type === "up") newCount += 1;
-              else newCount -= 1;
-            }
-            newVote = type;
-          }
-          return { userVote: newVote, count: newCount };
-        });
-      } else {
-        toast.error(res.error || "Failed to vote");
+      if (!res.success) {
+        toast.error((res as unknown as ActionResponseError).error);
+        return;
       }
+
+      // Update optimistic UI state
+      setVoteState((prev) => {
+        let newVote = prev.userVote;
+        let newCount = prev.count;
+
+        if (prev.userVote === type) {
+          // Toggle off (remove vote)
+          newVote = null;
+          if (type === "up") newCount -= 1;
+          else newCount += 1;
+        } else {
+          // Change vote or new vote
+          if (prev.userVote === "up" && type === "down") {
+            // Changed from up to down: -1 (remove up) + -1 (add down) = -2
+            newCount -= 2;
+          } else if (prev.userVote === "down" && type === "up") {
+            // Changed from down to up: +1 (remove down) + +1 (add up) = +2
+            newCount += 2;
+          } else {
+            // Null to vote
+            if (type === "up") newCount += 1;
+            else newCount -= 1;
+          }
+          newVote = type;
+        }
+        return { userVote: newVote, count: newCount };
+      });
     } catch {
       toast.error("Something went wrong");
     } finally {
@@ -122,12 +128,21 @@ export const PostCard = ({
         </Link>
         <div className="flex flex-col flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <Link href={`/u/${user?.id}`} className="hover:underline font-medium">
+            <Link
+              href={`/u/${user?.id}`}
+              className="hover:underline font-medium"
+            >
               {user?.name || "Unknown User"}
             </Link>
             {submission.participant?.domain && (
-              <Badge variant="outline" className="text-sm h-5 px-1.5 font-normal text-muted-foreground">
-                {DOMAINS.find((d) => d.id === submission.participant?.domain)?.title}
+              <Badge
+                variant="outline"
+                className="text-sm h-5 px-1.5 font-normal text-muted-foreground"
+              >
+                {
+                  DOMAINS.find((d) => d.id === submission.participant?.domain)
+                    ?.title
+                }
               </Badge>
             )}
           </div>
@@ -162,7 +177,7 @@ export const PostCard = ({
             onClick={() => handleVote("up")}
             className={cn(
               "text-muted-foreground gap-2 transition-colors hover:text-green-500 hover:bg-green-500/10",
-              voteState.userVote === "up" && "text-green-500 bg-green-500/10"
+              voteState.userVote === "up" && "text-green-500 bg-green-500/10",
             )}
           >
             <ArrowBigUp
@@ -178,7 +193,7 @@ export const PostCard = ({
             onClick={() => handleVote("down")}
             className={cn(
               "text-muted-foreground gap-2 transition-colors hover:text-red-500 hover:bg-red-500/10",
-              voteState.userVote === "down" && "text-red-500 bg-red-500/10"
+              voteState.userVote === "down" && "text-red-500 bg-red-500/10",
             )}
           >
             <ArrowBigDown
@@ -195,4 +210,3 @@ export const PostCard = ({
     </Card>
   );
 };
-

@@ -9,6 +9,9 @@ import NotStarted from "./_components/not-started";
 import { DeadlineOver } from "./_components/deadline-over";
 import { SubmissionList } from "./_components/submission-list";
 import { SubmitForm } from "./_components/submit-form";
+import { api } from "@/queries";
+import { StartChallengeCard } from "../(dashboard)/_components/start-challenge-card";
+import { Loading } from "@/components/ui/loading";
 
 const SubmissionsPage = () => {
   const searchParams = useSearchParams();
@@ -24,9 +27,18 @@ const SubmissionsPage = () => {
     router.push(`?${params.toString()}`);
   };
 
+  const { data: participation, isLoading } = api.participate.useGetMyParticipation();
+
   if (!isStarted) {
     return <NotStarted />;
   }
+
+  if (isLoading) {
+    return <Loading>Checking challenge status...</Loading>;
+  }
+
+  const participant = participation?.data;
+  const hasStartedChallenge = !!participant?.startedAt;
 
   return (
     <div className="flex gap-4">
@@ -54,7 +66,15 @@ const SubmissionsPage = () => {
           </TabsList>
 
           <TabsContent value="submit" className="mt-6">
-            {isOver ? <DeadlineOver /> : <SubmitForm />}
+            {!hasStartedChallenge ? (
+              <div className="max-w-xl mx-auto">
+                <StartChallengeCard />
+              </div>
+            ) : isOver ? (
+              <DeadlineOver />
+            ) : (
+              <SubmitForm startedAt={participant.startedAt} />
+            )}
           </TabsContent>
 
           <TabsContent value="my-submissions" className="mt-6">

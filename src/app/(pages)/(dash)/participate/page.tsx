@@ -13,16 +13,14 @@ import { compareAsc, startOfDay } from "date-fns";
 import { Loading } from "@/components/ui/loading";
 import { AlreadyParticipated } from "./_components/already-participated";
 import { RegistrationClosed } from "./_components/registration-closed";
+import { isRegistrationPeriodOver } from "@/lib/event";
 
 const Page = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: participation, isLoading } = useGetMyParticipation();
 
-  const today = startOfDay(new Date());
-  const startDate = startOfDay(CHALLANGE_DATA.startDate);
-  // Registration is open if today is before or on the start date
-  const isRegistrationOpen = compareAsc(today, startDate) <= 0;
+  const isRegistrationOpen = !isRegistrationPeriodOver();
 
   if (isLoading) {
     return <Loading>Checking participation status...</Loading>;
