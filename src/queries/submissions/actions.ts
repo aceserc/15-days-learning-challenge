@@ -26,15 +26,7 @@ export type DailySubmission = {
 export const submitDailyChallenge = tryCatchAction(
   async (data: DailySubmission): Promise<ActionResponse> => {
     const user = await getAuth();
-
-    // Double check dates logic backend side
     const today = startOfDay(new Date());
-    const startDate = startOfDay(CHALLANGE_DATA.startDate);
-
-    // Check if challenge has started
-    if (today < startDate) {
-      return { success: false, error: "Challenge has not started yet." };
-    }
 
     // Check if user is a participant
     const participantRes = await db
@@ -68,6 +60,22 @@ export const submitDailyChallenge = tryCatchAction(
     // Check if within duration relative to user's start
     const userStartDate = startOfDay(participant.startedAt);
     const daysSinceStart = differenceInDays(today, userStartDate) + 1;
+
+    // Validate that the day being submitted is not in the future
+    if (data.day > daysSinceStart) {
+      return {
+        success: false,
+        error: `You can only submit for days 1 to ${daysSinceStart}. You cannot submit for future days.`,
+      };
+    }
+
+    // Validate that the day is positive
+    if (data.day < 1) {
+      return {
+        success: false,
+        error: "Invalid day number.",
+      };
+    }
 
     if (daysSinceStart > CHALLANGE_DATA.canSubmitTillDays) {
       return { success: false, error: "Submission deadline is over." };

@@ -8,11 +8,19 @@ import { CHALLANGE_DATA } from "@/content/data";
 import { DomainName, DOMAINS } from "@/content/domains";
 import { tryCatchAction } from "../lib";
 import { getAuth } from "../middlewares/require-auth";
-import { isEventStarted } from "@/lib/event";
+import { isEventStarted, isRegistrationPeriodOver } from "@/lib/event";
 
 export const participateToChallenge = tryCatchAction(
   async (domain: string): Promise<ActionResponse> => {
     const user = await getAuth();
+
+    // Check if registration period is over
+    if (isRegistrationPeriodOver()) {
+      return {
+        success: false,
+        error: "Registration period has ended.",
+      };
+    }
 
     // Check if user has already participated
     const existing = await db

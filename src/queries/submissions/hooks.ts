@@ -10,6 +10,7 @@ import {
   getFeedSubmissions,
   getMySubmissions,
   submitDailyChallenge,
+  voteSubmission,
 } from "./actions";
 import { serverAction } from "../lib";
 
@@ -33,6 +34,10 @@ export const useSubmitDailyChallenge = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getMySubmissions"],
+      });
+      // Also invalidate feed since new submission should appear there
+      queryClient.invalidateQueries({
+        queryKey: ["getFeedSubmissions"],
       });
     },
   });
@@ -68,5 +73,22 @@ export const useGetFeedSubmissions = (limit: number = 20) => {
       return lastPage?.hasMore ? allPages.length + 1 : undefined;
     },
     initialPageParam: 1,
+  });
+};
+
+export const useVoteSubmission = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ submissionId, type }: { submissionId: string; type: "up" | "down" }) =>
+      serverAction(voteSubmission)(submissionId, type),
+    onSuccess: () => {
+      // Invalidate all queries that might show votes
+      queryClient.invalidateQueries({
+        queryKey: ["getFeedSubmissions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["getMySubmissions"],
+      });
+    },
   });
 };

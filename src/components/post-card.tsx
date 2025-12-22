@@ -15,7 +15,6 @@ import { Participant, Submission } from "@/db/schema";
 import { parseError } from "@/lib/parse-error";
 import { cn } from "@/lib/utils";
 import { api } from "@/queries";
-import { voteSubmission } from "@/queries/submissions/actions";
 import { formatRelative } from "date-fns";
 import { ArrowBigDown, ArrowBigUp, ExternalLink, Trash } from "lucide-react";
 import { User } from "next-auth";
@@ -37,6 +36,7 @@ export const PostCard = ({
 }: PostCardProps) => {
   const { data: session } = useSession();
   const deleteSubmissionMutation = api.submissions.useDeleteSubmission();
+  const voteSubmissionMutation = api.submissions.useVoteSubmission();
 
   const [isVoting, setIsVoting] = useState(false);
   const [voteState, setVoteState] = useState({
@@ -70,7 +70,10 @@ export const PostCard = ({
     setIsVoting(true);
 
     try {
-      const res = await voteSubmission(submission.id, type);
+      const res = await voteSubmissionMutation.mutateAsync({
+        submissionId: submission.id,
+        type,
+      });
 
       if (res.success) {
         setVoteState((prev) => {

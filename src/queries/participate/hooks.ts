@@ -15,7 +15,10 @@ export const useParticipateToChallenge = () => {
     mutationFn: serverAction(participateToChallenge),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["getMyParticipation", "participants"],
+        queryKey: ["getMyParticipation"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["participants"],
       });
     },
   });
