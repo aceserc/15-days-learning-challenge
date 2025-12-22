@@ -17,6 +17,15 @@ export const useParticipateToChallenge = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: serverAction(participateToChallenge),
+    onSuccess: async () => {
+      try {
+        await queryClient.invalidateQueries({
+          queryKey: ["getMyParticipation"],
+        });
+      } catch (error) {
+        // Log error but don't throw - cache invalidation is not critical to user experience
+        console.error("Failed to invalidate participation query:", error);
+      }
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getMyParticipation"],
