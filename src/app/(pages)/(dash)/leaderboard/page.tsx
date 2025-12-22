@@ -305,7 +305,7 @@ export default function LeaderboardPage() {
             </Card>
           ) : (
             <div className="text-center text-muted-foreground py-8">
-              {participants.length === 0 ? "No participants yet." : ""}
+              {participants.length === 0 ? "No leaderboard yet." : ""}
             </div>
           )}
         </div>

@@ -36,7 +36,7 @@ const formSchema = z.object({
   link: z
     .string()
     .url("Please enter a valid URL.")
-    .includes("linkedin.com/posts", {
+    .includes("linkedin.com", {
       error: "Please enter a valid linkedin post URL",
     }),
   summary: z.string().min(10, "Summary must be at least 10 characters."),
