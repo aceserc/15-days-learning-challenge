@@ -10,16 +10,13 @@ import {
 } from "@/components/ui/card";
 import { Rocket } from "lucide-react";
 import { api } from "@/queries";
-import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 export function StartChallengeCard() {
-  const queryClient = useQueryClient();
   const { mutate: start, isPending } = api.participate.useStartChallenge({
     onSuccess: (res) => {
       if (res.success) {
         toast.success(res.message!);
-        queryClient.invalidateQueries({ queryKey: ["participation"] });
       } else {
         toast.error(res.error!);
       }

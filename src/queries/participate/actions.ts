@@ -8,11 +8,19 @@ import { CHALLANGE_DATA } from "@/content/data";
 import { DomainName, DOMAINS } from "@/content/domains";
 import { tryCatchAction } from "../lib";
 import { getAuth } from "../middlewares/require-auth";
-import { isEventStarted } from "@/lib/event";
+import { isEventStarted, isRegistrationPeriodOver } from "@/lib/event";
 
 export const participateToChallenge = tryCatchAction(
   async (domain: string): Promise<ActionResponse> => {
     const user = await getAuth();
+
+    // Check if registration period is over
+    if (isRegistrationPeriodOver()) {
+      return {
+        success: false,
+        error: "Registration period has ended.",
+      };
+    }
 
     // Check if user has already participated
     const existing = await db
@@ -21,8 +29,8 @@ export const participateToChallenge = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -53,7 +61,7 @@ export const participateToChallenge = tryCatchAction(
       message:
         "Thank your for participating in ACES 15-Day Learning Challenge!",
     };
-  }
+  },
 );
 
 export const getMyParticipation = tryCatchAction(
@@ -66,8 +74,8 @@ export const getMyParticipation = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -84,7 +92,7 @@ export const getMyParticipation = tryCatchAction(
       message: "You have not participated in this challenge.",
       data: null,
     };
-  }
+  },
 );
 
 export const startChallenge = tryCatchAction(
@@ -104,8 +112,8 @@ export const startChallenge = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       )
       .limit(1);
 
@@ -129,13 +137,13 @@ export const startChallenge = tryCatchAction(
       .where(
         and(
           eq(participants.userId, user.id!),
-          eq(participants.techfestId, CHALLANGE_DATA.techfestId)
-        )
+          eq(participants.techfestId, CHALLANGE_DATA.techfestId),
+        ),
       );
 
     return {
       success: true,
       message: "Challenge started! Good luck!",
     };
-  }
+  },
 );
