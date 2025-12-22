@@ -187,7 +187,7 @@ export const SubmitForm = ({ startedAt }: { startedAt?: Date | null }) => {
                         include, or which tags to use, you can see a sample post{" "}
                         <Link
                           className="text-primary underline inline"
-                          href={"/sample.jpeg"}
+                          href={"https://www.linkedin.com/posts/jrtilak_aces-alc-techfest-activity-7408703816398823424-gLOa?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEB1MrcBpMlX2jM9qpVM2VQn3my7eLJfIaA"}
                           target="_blank"
                         >
                           here
