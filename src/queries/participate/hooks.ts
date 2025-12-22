@@ -13,9 +13,9 @@ export const useParticipateToChallenge = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: serverAction(participateToChallenge),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["getMyParticipation", "participants"],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["getMyParticipation"],
       });
     },
   });
