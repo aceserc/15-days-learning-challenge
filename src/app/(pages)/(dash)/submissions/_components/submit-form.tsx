@@ -33,12 +33,9 @@ import { z } from "zod";
 
 const formSchema = z.object({
   day: z.string().min(1, "Please select a day."),
-  link: z
-    .string()
-    .url("Please enter a valid URL.")
-    .includes("linkedin.com", {
-      error: "Please enter a valid linkedin post URL",
-    }),
+  link: z.string().url("Please enter a valid URL.").includes("linkedin.com", {
+    error: "Please enter a valid linkedin post URL",
+  }),
   summary: z.string().min(10, "Summary must be at least 10 characters."),
   verifyHashtags: z.boolean().refine((val) => val === true, {
     message: "You must use the required hashtags.",
@@ -156,9 +153,9 @@ export const SubmitForm = ({ startedAt }: { startedAt?: Date | null }) => {
                                 className={cn(
                                   "relative flex cursor-pointer aspect-square flex-col items-center justify-center rounded-xl border-2 border-muted bg-card py-4 text-center transition-all hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary shadow-sm",
                                   isDisabled &&
-                                  "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
+                                    "cursor-not-allowed opacity-40 hover:bg-card hover:text-muted-foreground",
                                   isSubmitted &&
-                                  "border-primary/20 bg-primary/5 text-primary opacity-60"
+                                    "border-primary/20 bg-primary/5 text-primary opacity-60"
                                 )}
                               >
                                 <span className="text-xl font-bold">{day}</span>
@@ -187,7 +184,9 @@ export const SubmitForm = ({ startedAt }: { startedAt?: Date | null }) => {
                         include, or which tags to use, you can see a sample post{" "}
                         <Link
                           className="text-primary underline inline"
-                          href={"https://www.linkedin.com/posts/jrtilak_aces-alc-techfest-activity-7408703816398823424-gLOa?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEB1MrcBpMlX2jM9qpVM2VQn3my7eLJfIaA"}
+                          href={
+                            "https://www.linkedin.com/posts/jrtilak_aces-alc-techfest-activity-7408703816398823424-gLOa?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEB1MrcBpMlX2jM9qpVM2VQn3my7eLJfIaA"
+                          }
                           target="_blank"
                         >
                           here
@@ -384,7 +383,7 @@ export const SubmitForm = ({ startedAt }: { startedAt?: Date | null }) => {
                   />
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-col sm:flex-row">
                   <Button
                     type="button"
                     variant="outline"
