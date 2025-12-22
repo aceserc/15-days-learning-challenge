@@ -65,7 +65,7 @@ export const submitDailyChallenge = tryCatchAction(
     if (data.day > daysSinceStart) {
       return {
         success: false,
-        error: `You can only submit for days 1 to ${daysSinceStart}. You cannot submit for future days.`,
+        error: `You can only submit for days 1 to ${daysSinceStart}.`,
       };
     }
 
