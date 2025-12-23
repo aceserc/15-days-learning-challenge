@@ -52,44 +52,48 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 md:p-8 max-w-5xl">
+      <div className="container mx-auto max-w-5xl">
         <div className="space-y-8">
           {/* Header */}
-          {participants.length > 0 && < div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <h1 className="text-xl sm:text-3xl font-bold">Leaderboard 🏆</h1>
-              <Button
-                onClick={() => {
-                  alert({
-                    title: "Info",
-                    variant: "default",
-                    actionText: "OK, Got it!",
-                    description: (
-                      <>
-                        <p className="text-muted-foreground text-lg">
-                          It includes top performance stats, and the list is
-                          updated every hour.
-                          <br />
-                          The rankings are calculated based on your streak and
-                          the submission order (who submitted earlier). Being
-                          first or last on the leaderboard doesn’t mean
-                          much—it’s mainly for general reference.
-                          <br />
-                          The only thing that truly matters is keeping your
-                          15-day streak.
-                        </p>
-                      </>
-                    ),
-                  });
-                }}
-                variant={"outline"}
-                size={"icon"}
-                className="ml-4 text-muted-foreground shadow-none"
-              >
-                <Info />
-              </Button>
+          {participants.length > 0 && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <h1 className="text-xl sm:text-3xl font-bold">
+                  Leaderboard 🏆
+                </h1>
+                <Button
+                  onClick={() => {
+                    alert({
+                      title: "Info",
+                      variant: "default",
+                      actionText: "OK, Got it!",
+                      description: (
+                        <>
+                          <p className="text-muted-foreground text-lg">
+                            It includes top performance stats, and the list is
+                            updated every hour.
+                            <br />
+                            The rankings are calculated based on your streak and
+                            the submission order (who submitted earlier). Being
+                            first or last on the leaderboard doesn’t mean
+                            much—it’s mainly for general reference.
+                            <br />
+                            The only thing that truly matters is keeping your
+                            15-day streak.
+                          </p>
+                        </>
+                      ),
+                    });
+                  }}
+                  variant={"outline"}
+                  size={"icon"}
+                  className="ml-4 text-muted-foreground shadow-none"
+                >
+                  <Info />
+                </Button>
+              </div>
             </div>
-          </div>}
+          )}
 
           {/* Top 3 Section */}
           {top3.length > 0 && (
@@ -114,8 +118,8 @@ export default function LeaderboardPage() {
                           index === 0
                             ? "bg-yellow-500/10 border-yellow-500"
                             : index === 1
-                              ? "bg-gray-400/10 border-gray-400"
-                              : "bg-amber-700/10 border-amber-700",
+                            ? "bg-gray-400/10 border-gray-400"
+                            : "bg-amber-700/10 border-amber-700"
                         )}
                       >
                         <div className="text-3xl">
@@ -129,8 +133,8 @@ export default function LeaderboardPage() {
                             index === 0
                               ? "w-14 h-14 border-yellow-500"
                               : index === 1
-                                ? "w-12 h-12 border-gray-400"
-                                : "w-12 h-12 border-amber-700",
+                              ? "w-12 h-12 border-gray-400"
+                              : "w-12 h-12 border-amber-700"
                           )}
                         >
                           <AvatarImage src={participant.image || undefined} />
@@ -177,8 +181,8 @@ export default function LeaderboardPage() {
                           isFirst
                             ? "bg-primary/10 h-64 border-t-4 border-yellow-500"
                             : isSecond
-                              ? "bg-muted/50 h-52 border-t-4 border-gray-400"
-                              : "bg-muted/30 h-44 border-t-4 border-amber-700",
+                            ? "bg-muted/50 h-52 border-t-4 border-gray-400"
+                            : "bg-muted/30 h-44 border-t-4 border-amber-700"
                         )}
                       >
                         {/* Medal / Badge */}
@@ -196,8 +200,8 @@ export default function LeaderboardPage() {
                               isFirst
                                 ? "w-16 h-16 border-yellow-500"
                                 : isSecond
-                                  ? "w-14 h-14 border-gray-400"
-                                  : "w-12 h-12 border-amber-700",
+                                ? "w-14 h-14 border-gray-400"
+                                : "w-12 h-12 border-amber-700"
                             )}
                           >
                             <AvatarImage src={participant.image || undefined} />
@@ -288,7 +292,7 @@ export default function LeaderboardPage() {
                             className={cn(
                               "font-mono font-bold",
                               getCurrentDayNumber() >
-                              participant.currentStreak && "text-destructive",
+                                participant.currentStreak && "text-destructive"
                             )}
                           >
                             {participant.currentStreak}
@@ -310,6 +314,6 @@ export default function LeaderboardPage() {
           )}
         </div>
       </div>
-    </div >
+    </div>
   );
 }

@@ -2,10 +2,11 @@
 
 import { db } from "@/db";
 import { leaderboard, participants, submissions, users } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { tryCatchAction } from "../lib";
 import { ActionResponse } from "../types";
-
+import { CHALLANGE_DATA } from "@/content/data";
+import fs from "fs";
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
 
@@ -23,7 +24,6 @@ function calculateCurrentStreak(days: number[]): number {
 
   return streak;
 }
-
 
 export const updateLeaderboard = tryCatchAction(
   async (techfestId?: string): Promise<ActionResponse> => {
@@ -150,8 +150,8 @@ export type LeaderboardWithUser = {
 };
 
 export const getLeaderboard = tryCatchAction(
-  async (techfestId?: string): Promise<ActionResponse<LeaderboardWithUser[]>> => {
-    const leaderboardData = await db
+  async (): Promise<ActionResponse<LeaderboardWithUser[]>> => {
+    let leaderboardData = await db
       .select({
         // Leaderboard columns
         userId: leaderboard.userId,
@@ -173,10 +173,34 @@ export const getLeaderboard = tryCatchAction(
       .from(leaderboard)
       .leftJoin(users, eq(leaderboard.userId, users.id))
       .leftJoin(participants, eq(leaderboard.userId, participants.userId))
-      .where(
-        techfestId ? eq(leaderboard.techfestId, techfestId) : sql`true`
-      )
-      .orderBy(sql`leaderboard.rank ASC`);
+      .where(eq(leaderboard.date, new Date().toISOString().split("T")[0]));
+
+    fs.writeFileSync(
+      "./public/leaderboard.json",
+      JSON.stringify(leaderboardData, null, 2)
+    );
+
+    leaderboardData = leaderboardData.sort((a, b) => {
+      // 1. Highest streak first
+      if (b.currentStreak !== a.currentStreak) {
+        return b.currentStreak - a.currentStreak;
+      }
+
+      // Convert latestDay strings to timestamps
+      const timeA = new Date(a.latestDay).getTime();
+      const timeB = new Date(b.latestDay).getTime();
+
+      // 2. Latest day first
+      const dayA = new Date(a.latestDay).setHours(0, 0, 0, 0);
+      const dayB = new Date(b.latestDay).setHours(0, 0, 0, 0);
+
+      if (dayB !== dayA) {
+        return dayB - dayA; // latest day on top
+      }
+
+      // 3. Same day: earlier submission first
+      return timeA - timeB;
+    });
 
     return {
       success: true,
