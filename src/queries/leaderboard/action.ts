@@ -2,9 +2,10 @@
 
 import { db } from "@/db";
 import { leaderboard, participants, submissions, users } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { tryCatchAction } from "../lib";
 import { ActionResponse } from "../types";
+
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
 
@@ -78,12 +79,15 @@ export const updateLeaderboard = tryCatchAction(
       }
     );
 
-    // 4. Sort by streak descending, then earliest submission ascending
+    // 4. SORT: only this part changed to match your rules
     leaderboardData.sort((a, b) => {
       if (b.currentStreak !== a.currentStreak) {
-        return b.currentStreak - a.currentStreak;
+        return b.currentStreak - a.currentStreak; // highest streak first
       }
-      return a.earliestSubmission.getTime() - b.earliestSubmission.getTime();
+      if (b.latestDay !== a.latestDay) {
+        return b.latestDay - a.latestDay; // latest day first
+      }
+      return a.earliestSubmission.getTime() - b.earliestSubmission.getTime(); // earlier submission first
     });
 
     // 5. Prepare insert data
@@ -130,6 +134,7 @@ export const updateLeaderboard = tryCatchAction(
     };
   }
 );
+
 export type LeaderboardWithUser = {
   userId: string;
   currentStreak: number;
@@ -144,12 +149,11 @@ export type LeaderboardWithUser = {
   email: string | null;
   image: string | null; // avatar URL
   domain: string | null;
-  // Add any other user fields you want
 };
 
 export const getLeaderboard = tryCatchAction(
   async (): Promise<ActionResponse<LeaderboardWithUser[]>> => {
-    let leaderboardData = await db
+    const leaderboardData = await db
       .select({
         // Leaderboard columns
         userId: leaderboard.userId,
@@ -171,29 +175,11 @@ export const getLeaderboard = tryCatchAction(
       .from(leaderboard)
       .leftJoin(users, eq(leaderboard.userId, users.id))
       .leftJoin(participants, eq(leaderboard.userId, participants.userId))
-      .where(eq(leaderboard.date, new Date().toISOString().split("T")[0]));
-
-    leaderboardData = leaderboardData.sort((a, b) => {
-      // 1. Highest streak first
-      if (b.currentStreak !== a.currentStreak) {
-        return b.currentStreak - a.currentStreak;
-      }
-
-      // Convert latestDay strings to timestamps
-      const timeA = new Date(a.latestDay).getTime();
-      const timeB = new Date(b.latestDay).getTime();
-
-      // 2. Latest day first
-      const dayA = new Date(a.latestDay).setHours(0, 0, 0, 0);
-      const dayB = new Date(b.latestDay).setHours(0, 0, 0, 0);
-
-      if (dayB !== dayA) {
-        return dayB - dayA; // latest day on top
-      }
-
-      // 3. Same day: earlier submission first
-      return timeA - timeB;
-    });
+      .where(
+        // same date
+        eq(leaderboard.date, new Date().toISOString().split("T")[0])
+      )
+      .orderBy(sql`leaderboard.rank ASC`);
 
     return {
       success: true,
