@@ -2,11 +2,9 @@
 
 import { db } from "@/db";
 import { leaderboard, participants, submissions, users } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { tryCatchAction } from "../lib";
 import { ActionResponse } from "../types";
-import { CHALLANGE_DATA } from "@/content/data";
-import fs from "fs";
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
 
@@ -174,11 +172,6 @@ export const getLeaderboard = tryCatchAction(
       .leftJoin(users, eq(leaderboard.userId, users.id))
       .leftJoin(participants, eq(leaderboard.userId, participants.userId))
       .where(eq(leaderboard.date, new Date().toISOString().split("T")[0]));
-
-    fs.writeFileSync(
-      "./public/leaderboard.json",
-      JSON.stringify(leaderboardData, null, 2)
-    );
 
     leaderboardData = leaderboardData.sort((a, b) => {
       // 1. Highest streak first
