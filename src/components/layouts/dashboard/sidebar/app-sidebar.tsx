@@ -4,9 +4,12 @@ import {
   ChevronsUpDown,
   CircleUserRound,
   LayoutDashboard,
+  MedalIcon,
   Rss,
   Send,
+  Shield,
   ShieldAlert,
+  ShieldCheck,
   Trophy,
 } from "lucide-react";
 import * as React from "react";
@@ -41,6 +44,16 @@ const GETTING_STARTED_LINKS: Navlink[] = [
     url: "/feed",
     icon: Rss,
   },
+  {
+    name: "Guidelines",
+    url: "/guidelines",
+    icon: ShieldCheck,
+  },
+  {
+    name: "Prizes",
+    url: "/prizes",
+    icon: MedalIcon,
+  },
 ];
 
 const OTHER_LINKS: Navlink[] = [
@@ -48,7 +61,7 @@ const OTHER_LINKS: Navlink[] = [
     name: "Feedback",
     url: process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL as string,
     icon: Send,
-    target: "_blank"
+    target: "_blank",
   },
   {
     name: "Support",
@@ -58,7 +71,10 @@ const OTHER_LINKS: Navlink[] = [
   },
 ];
 
-export function AppSidebar({ isAdmin, ...props }: React.ComponentProps<typeof Sidebar> & { isAdmin?: boolean }) {
+export function AppSidebar({
+  isAdmin,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { isAdmin?: boolean }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
