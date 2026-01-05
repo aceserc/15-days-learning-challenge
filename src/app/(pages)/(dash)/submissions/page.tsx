@@ -12,6 +12,15 @@ import { SubmitForm } from "./_components/submit-form";
 import { api } from "@/queries";
 import { StartChallengeCard } from "../(dashboard)/_components/start-challenge-card";
 import { Loading } from "@/components/ui/loading";
+import { CHALLANGE_DATA } from "@/content/data";
+import { Confetti } from "@/components/ui/confetti";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Trophy } from "lucide-react";
 
 const SubmissionsPage = () => {
   const searchParams = useSearchParams();
@@ -28,6 +37,8 @@ const SubmissionsPage = () => {
   };
 
   const { data: participation, isLoading } = api.participate.useGetMyParticipation();
+  const { data: submissionsData } = api.submissions.useGetMySubmissions();
+
 
   if (!isStarted) {
     return <NotStarted />;
@@ -39,6 +50,12 @@ const SubmissionsPage = () => {
 
   const participant = participation?.data;
   const hasStartedChallenge = !!participant?.startedAt;
+
+  const submissions = submissionsData?.data || [];
+  const days = submissions.map((s) => s.day);
+  const daysRemaining = CHALLANGE_DATA.durationInDays - days.length;
+  const isCompleted = daysRemaining <= 0;
+
 
   return (
     <div className="flex gap-4">
@@ -70,6 +87,21 @@ const SubmissionsPage = () => {
               <div className="max-w-xl mx-auto">
                 <StartChallengeCard />
               </div>
+            ) : isCompleted ? (
+              <Card className="relative overflow-hidden border-2 border-primary/20 bg-primary/5">
+                <Confetti
+                  className="absolute inset-0 z-0 pointer-events-none w-full h-full"
+                />
+                <CardHeader className="relative z-10">
+                  <CardTitle className="text-2xl text-center text-primary flex items-center justify-center gap-2">
+                    <Trophy className="h-8 w-8" />
+                    Challenge Completed!
+                  </CardTitle>
+                  <CardDescription className="text-center text-lg mt-2 font-medium">
+                    {CHALLANGE_DATA.messageAfterCompletion}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
             ) : isOver ? (
               <DeadlineOver />
             ) : (

@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StartChallengeCard } from "./_components/start-challenge-card";
 import { SubmitProgressCard } from "./_components/submit-progress-card";
 import { isEventStarted } from "@/lib/event";
+import { Confetti } from "@/components/ui/confetti";
 
 function calculateCurrentStreak(days: number[]): number {
   if (days.length === 0) return 0;
@@ -60,6 +61,8 @@ export default function DashboardPage() {
     };
   }, [submissions]);
 
+  const isCompleted = stats.daysRemaining <= 0;
+
   return (
     <div className="min-h-screen bg-background space-y-8">
       {/* Header & Actions */}
@@ -70,7 +73,22 @@ export default function DashboardPage() {
           ) : participation?.data ? (
             <div className="space-y-8">
               <RewardCard participation={participation.data} />
-              {participation.data.startedAt ? (
+              {isCompleted ? (
+                <Card className="relative overflow-hidden border-2 border-primary/20 bg-primary/5">
+                  <Confetti
+                    className="absolute inset-0 z-0 pointer-events-none w-full h-full"
+                  />
+                  <CardHeader className="relative z-10">
+                    <CardTitle className="text-2xl text-center text-primary flex items-center justify-center gap-2">
+                      <Trophy className="h-8 w-8" />
+                      Challenge Completed!
+                    </CardTitle>
+                    <CardDescription className="text-center text-lg mt-2 font-medium">
+                      {CHALLANGE_DATA.messageAfterCompletion}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ) : participation.data.startedAt ? (
                 <SubmitProgressCard />
               ) : (
                 isEventStarted() && <StartChallengeCard />

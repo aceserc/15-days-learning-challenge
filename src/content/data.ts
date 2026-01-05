@@ -5,4 +5,5 @@ export const CHALLANGE_DATA = {
   canSubmitTillDays: 16,
   registrationGracePeriodDays: 7,
   postHashtags: ["#aces", "#alc", "#techfest"],
+  messageAfterCompletion: "Congratulations on completing the Tranaga Presents 15 day learning challenge! We will contact you through email shortly!"
 };
