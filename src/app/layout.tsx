@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "@/providers";
 import NextTopLoader from "nextjs-toploader";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -21,7 +22,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} font-sans antialiased`}>
         <SessionProvider>
-          <Providers>{children}</Providers>
+          <Script
+            src="https://analytics.aceserc.org/script.js"
+            strategy="afterInteractive"
+            data-website-id="c0224625-37b9-428b-b52a-9a2a7cfc7979"
+          />          <Providers>{children}</Providers>
           <NextTopLoader
             color="var(--primary)"
             initialPosition={0.08}

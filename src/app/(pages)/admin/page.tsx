@@ -4,11 +4,14 @@ import AdminStats from "./_components/admin-stats";
 import ParticipantsList from "./_components/participants-list";
 import UsersList from "./_components/users-list";
 
+import GenerateLeaderboardButton from "./_components/generate-leaderboard-button";
+
 export default function AdminDashboardPage() {
   return (
     <div className="flex-1 space-y-4 ">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Admin Dashboard</h2>
+        <GenerateLeaderboardButton />
       </div>
       <AdminStats />
       <AdminCharts />
