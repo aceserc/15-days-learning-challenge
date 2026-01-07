@@ -7,8 +7,10 @@ import { addDays, format, startOfDay } from "date-fns";
 import { CalendarOff } from "lucide-react";
 import Link from "next/link";
 
-const DeadlineOver = () => {
-  const startDate = startOfDay(CHALLANGE_DATA.startDate);
+const DeadlineOver = ({ startedAt }: { startedAt?: Date | null }) => {
+  const startDate = startedAt
+    ? startOfDay(startedAt)
+    : startOfDay(CHALLANGE_DATA.startDate);
   const deadlineDate = addDays(startDate, CHALLANGE_DATA.canSubmitTillDays);
 
   return (

@@ -19,7 +19,6 @@ const SubmissionsPage = () => {
   const currentTab = searchParams.get("tab") || "submit";
 
   const isStarted = isEventStarted();
-  const isOver = isDeadlineOver();
 
   const handleTabChange = (val: string) => {
     const params = new URLSearchParams(searchParams);
@@ -27,7 +26,8 @@ const SubmissionsPage = () => {
     router.push(`?${params.toString()}`);
   };
 
-  const { data: participation, isLoading } = api.participate.useGetMyParticipation();
+  const { data: participation, isLoading } =
+    api.participate.useGetMyParticipation();
 
   if (!isStarted) {
     return <NotStarted />;
@@ -39,6 +39,7 @@ const SubmissionsPage = () => {
 
   const participant = participation?.data;
   const hasStartedChallenge = !!participant?.startedAt;
+  const isOver = isDeadlineOver(participant?.startedAt);
 
   return (
     <div className="flex gap-4">
@@ -71,7 +72,7 @@ const SubmissionsPage = () => {
                 <StartChallengeCard />
               </div>
             ) : isOver ? (
-              <DeadlineOver />
+              <DeadlineOver startedAt={participant?.startedAt} />
             ) : (
               <SubmitForm startedAt={participant.startedAt} />
             )}

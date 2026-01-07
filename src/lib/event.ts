@@ -31,7 +31,14 @@ export function getDeadlineDate(): Date {
   );
 }
 
-export function isDeadlineOver(): boolean {
+export function isDeadlineOver(startedAt?: Date | null): boolean {
+  if (startedAt) {
+    const deadline = addDays(
+      startOfDay(startedAt),
+      CHALLANGE_DATA.canSubmitTillDays
+    );
+    return isAfter(startOfDay(new Date()), deadline);
+  }
   return isAfter(startOfDay(new Date()), getDeadlineDate());
 }
 
