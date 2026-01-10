@@ -1,4 +1,4 @@
-# ACES 15-Day Learning Challenge
+# ACES 15-Day Learning Challenge:
 
 A Next.js 15 application for managing ACES TechFest's 15-day learning challenge with daily submissions, streak tracking, and leaderboards.
 
